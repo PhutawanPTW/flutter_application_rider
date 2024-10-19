@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gcm_defaultSenderId" translatable="false">1017717891789</string>
+    <string name="google_api_key" translatable="false">AIzaSyDpejVAjzsYXgdTuzpGbUIgnT0DJc7YRXU</string>
+    <string name="google_app_id" translatable="false">1:1017717891789:android:5bb5981c79e6561b463f84</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDpejVAjzsYXgdTuzpGbUIgnT0DJc7YRXU</string>
+    <string name="google_storage_bucket" translatable="false">projectrider-d2fd4.appspot.com</string>
+    <string name="project_id" translatable="false">projectrider-d2fd4</string>
+</resources>
