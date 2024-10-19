@@ -17,38 +17,34 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
 
   // Function to log in and check user type
-  Future<void> _login(
-      BuildContext context, String phoneNumber, String password) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+  Future<void> _login(BuildContext context, String phoneNumber, String password) async {
+  final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-    try {
-      // Call the login method from AuthProvider
-      await authProvider.loginUser(phoneNumber, password);
+  try {
+    await authProvider.loginUser(phoneNumber, password);
 
-      // Navigate to the respective page based on userType
-      if (authProvider.currentUserType == 'User') {
-        _showSuccessDialog(context);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                const MyOrderPage(), // User goes to MyOrderPage
-          ),
-        );
-      } else if (authProvider.currentUserType == 'Rider') {
-        _showSuccessDialog(context);
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) =>
-        //         const HomeRiderPage(), // Rider goes to HomeRiderPage
-        //   ),
-        // );
-      }
-    } catch (e) {
-      _showErrorDialog(context, e.toString());
+    // Navigate to the respective page based on userType
+    if (authProvider.currentUserType == 'User') {
+      _showSuccessDialog(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const MyOrderPage(), // User goes to OrderPage
+        ),
+      );
+    } else if (authProvider.currentUserType == 'Rider') {
+      _showSuccessDialog(context);
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => const HomeRiderPage(), // Rider goes to HomeRiderPage
+      //   ),
+      // );
     }
+  } catch (e) {
+    _showErrorDialog(context, e.toString());
   }
+}
 
   // Success Dialog
   void _showSuccessDialog(BuildContext context) {

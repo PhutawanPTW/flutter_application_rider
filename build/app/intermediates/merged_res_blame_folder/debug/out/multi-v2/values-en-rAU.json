@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.flutter_application_rider.app-mergeDebugResources-31:/values-en-rAU/values-en-rAU.xml",
+            "outputFile": "com.example.flutter_application_rider.app-mergeDebugResources-6:/values-en-rAU/values-en-rAU.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\MSI GF63\\.gradle\\caches\\transforms-3\\61dca973873414c0fec9033efc963138\\transformed\\core-1.13.1\\res\\values-en-rAU\\values-en-rAU.xml",
+                    "source": "C:\\Users\\Phutawan Chonsakorn\\.gradle\\caches\\transforms-3\\61dca973873414c0fec9033efc963138\\transformed\\core-1.13.1\\res\\values-en-rAU\\values-en-rAU.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",

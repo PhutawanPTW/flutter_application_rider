@@ -7,7 +7,7 @@ class AuthProvider extends ChangeNotifier {
 
   bool isLoggedIn = false;
   String? currentUserType;
-   String? currentUserPhoneNumber; 
+  String? currentUserPhoneNumber;
 
   String? email;
   String? phoneNumber;
@@ -46,22 +46,19 @@ class AuthProvider extends ChangeNotifier {
     return !userQuery.exists;
   }
 
-Future<void> loginUser(String phoneNumber, String password) async {
+  Future<void> loginUser(String phoneNumber, String password) async {
     try {
-      // Query Firestore to get the user document by phoneNumber
-      DocumentSnapshot userDoc = await _firestore
-          .collection('Users')
-          .doc(phoneNumber)
-          .get();
+      DocumentSnapshot userDoc =
+          await _firestore.collection('Users').doc(phoneNumber).get();
 
       if (userDoc.exists) {
         var userData = userDoc.data() as Map<String, dynamic>;
 
-        // Check if the password matches
         if (userData['password'] == password) {
           isLoggedIn = true;
-          currentUserPhoneNumber = phoneNumber; // เก็บเบอร์โทรของผู้ใช้
-          notifyListeners(); // Notify the listeners about the change
+          currentUserPhoneNumber = phoneNumber;
+          currentUserType = userData['userType']; // Store the user type
+          notifyListeners();
         } else {
           throw Exception('Incorrect password');
         }
