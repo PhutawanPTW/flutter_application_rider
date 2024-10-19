@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_rider/pages/page_main/order.dart';
 import 'package:flutter_application_rider/pages/signup.dart';
+import 'package:flutter_application_rider/providers/user_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart'; // Import provider
 import 'package:flutter_application_rider/providers/auth_provider.dart'; // Import AuthProvider
@@ -17,34 +18,34 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
 
   // Function to log in and check user type
-  Future<void> _login(BuildContext context, String phoneNumber, String password) async {
-  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+  Future<void> _login(
+      BuildContext context, String phoneNumber, String password) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-  try {
-    await authProvider.loginUser(phoneNumber, password);
+    try {
+      await authProvider.loginUser(phoneNumber, password);
 
-    // Navigate to the respective page based on userType
-    if (authProvider.currentUserType == 'User') {
-      _showSuccessDialog(context);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const MyOrderPage(), // User goes to OrderPage
-        ),
-      );
-    } else if (authProvider.currentUserType == 'Rider') {
-      _showSuccessDialog(context);
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => const HomeRiderPage(), // Rider goes to HomeRiderPage
-      //   ),
-      // );
+      // Fetch user data after successful login
+      await userProvider.fetchUserData(phoneNumber);
+
+      // Navigate to the respective page based on userType
+      if (authProvider.currentUserType == 'User') {
+        _showSuccessDialog(context);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MyOrderPage(),
+          ),
+        );
+      } else if (authProvider.currentUserType == 'Rider') {
+        _showSuccessDialog(context);
+        // Navigate to Rider's home page
+      }
+    } catch (e) {
+      _showErrorDialog(context, e.toString());
     }
-  } catch (e) {
-    _showErrorDialog(context, e.toString());
   }
-}
 
   // Success Dialog
   void _showSuccessDialog(BuildContext context) {
