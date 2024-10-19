@@ -9,7 +9,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
