@@ -33,112 +33,79 @@ class _MyOrderPageState extends State<MyOrderPage> {
     });
   }
 
-  Future<void> _login(BuildContext context, String phoneNumber, String password) async {
-    try {
-      // Query Firestore to get the user data by phoneNumber
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(phoneNumber)
-          .get();
-
-      if (userDoc.exists) {
-        var userData = userDoc.data() as Map<String, dynamic>;
-
-        // Check if the password matches
-        if (userData['password'] == password) {
-          // Check the user type and navigate accordingly
-          if (userData['userType'] == 'User') {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MyOrderPage(), // User goes to MyOrderPage
-              ),
-            );
-          } else if (userData['userType'] == 'Rider') {
-            // Navigator.pushReplacement(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => const HomeRiderPage(), // Rider goes to HomeRiderPage
-            //   ),
-            // );
-          }
-        } else {
-          _showErrorDialog(context, 'Incorrect password');
-        }
-      } else {
-        _showErrorDialog(context, 'User not found');
-      }
-    } catch (e) {
-      _showErrorDialog(context, 'Error: $e');
-    }
-  }
-
-  // Function to show error dialog
-  void _showErrorDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Login Failed'),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Center(
-          child: Text(
-            'My Order',
-            style: GoogleFonts.leagueSpartan(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+      extendBodyBehindAppBar: false, // ไม่ให้ body ขยายไปด้านหลัง AppBar
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(70.0),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          flexibleSpace: SafeArea(
+            child: Center(
+              child: Text(
+                'My Order',
+                style: GoogleFonts.leagueSpartan(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
+          backgroundColor: const Color(0xFFF5CB58),
+          elevation: 0,
         ),
-        backgroundColor: const Color(0xFFF5CB58),
       ),
       body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/svg/home.svg',
-              color: _selectedIndex == 0 ? const Color(0xFFE95322) : Colors.grey,
-            ),
-            label: 'Home',
+      bottomNavigationBar: Container(
+        height: 60,
+        decoration: const BoxDecoration(
+          color: Color(0xFFE95322),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/svg/orders.svg',
-              color: _selectedIndex == 1 ? const Color(0xFFE95322) : Colors.grey,
-            ),
-            label: 'Orders',
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/svg/profile.svg',
-              color: _selectedIndex == 2 ? const Color(0xFFE95322) : Colors.grey,
-            ),
-            label: 'Profile',
+          child: BottomNavigationBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  'assets/svg/home.svg',
+                  color: Colors.white,
+                ),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  'assets/svg/orders.svg',
+                  color: Colors.white,
+                ),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  'assets/svg/profile.svg',
+                  color: Colors.white,
+                ),
+                label: '',
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.white.withOpacity(0.6),
+            onTap: _onItemTapped,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
           ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFFE95322),
-        onTap: _onItemTapped,
+        ),
       ),
     );
   }

@@ -13,95 +13,119 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(15),
+          topRight: Radius.circular(15),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      isReceiveMode = false;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: !isReceiveMode
+                        ? const Color(0xFFE95322)
+                        : const Color(0xFFFFDECF),
+                    textStyle: GoogleFonts.leagueSpartan(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'Send',
+                    style: TextStyle(
+                        color: !isReceiveMode
+                            ? Colors.white
+                            : const Color(0xFFE95322)),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      isReceiveMode = true;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isReceiveMode
+                        ? const Color(0xFFE95322)
+                        : const Color(0xFFFFDECF),
+                    textStyle: GoogleFonts.leagueSpartan(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'Receive',
+                    style: TextStyle(
+                        color: isReceiveMode
+                            ? Colors.white
+                            : const Color(0xFFE95322)),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: isReceiveMode
+                  ? _buildReceiveOrderList()
+                  : _buildSendOrderList(),
+            ),
+            if (!isReceiveMode) ...[
+              const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    isReceiveMode = false;
-                  });
-                },
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: !isReceiveMode ? const Color(0xFFE95322) : const Color(0xFFFFDECF),
+                  backgroundColor: const Color(0xFFFFDECF),
                   textStyle: GoogleFonts.leagueSpartan(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-                child: Text(
-                  'Send',
-                  style: TextStyle(color: !isReceiveMode ? Colors.white : const Color(0xFFE95322)),
-                ),
-              ),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    isReceiveMode = true;
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isReceiveMode ? const Color(0xFFE95322) : const Color(0xFFFFDECF),
-                  textStyle: GoogleFonts.leagueSpartan(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                child: Text(
-                  'Receive',
-                  style: TextStyle(color: isReceiveMode ? Colors.white : const Color(0xFFE95322)),
+                child: const Text(
+                  'Add New Order',
+                  style: TextStyle(color: Color(0xFFE95322)),
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: isReceiveMode ? _buildReceiveOrderList() : _buildSendOrderList(),
-          ),
-          if (!isReceiveMode) ...[
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFFDECF),
-                textStyle: GoogleFonts.leagueSpartan(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: const Text(
-                'Add New Order',
-                style: TextStyle(color: Color(0xFFE95322)),
-              ),
-            ),
           ],
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildSendOrderList() {
     return ListView(
-      children: [
-        _buildOrderCard('assets/images/strawberry_shake.jpg', 'Strawberry Shake', 'Wait for Rider'),
-        _buildOrderCard('assets/images/hong_thong.jpg', 'Hong Thong', 'Wait for Take'),
-        _buildOrderCard('assets/images/white_whisky.jpg', 'White Whisky', 'Driving'),
-      ],
-    );
+        children: [
+          _buildOrderCard('assets/images/strawberry_shake.jpg',
+              'Strawberry Shake', 'Wait for Rider'),
+          _buildOrderCard(
+              'assets/images/hong_thong.jpg', 'Hong Thong', 'Wait for Take'),
+          _buildOrderCard(
+              'assets/images/white_whisky.jpg', 'White Whisky', 'Driving'),
+        ],
+        );
   }
 
   Widget _buildReceiveOrderList() {
@@ -122,9 +146,12 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
         Expanded(
           child: ListView(
             children: [
-              _buildReceiveOrderCard('Order #1234', '3 items', '฿150', '1.5 km'),
-              _buildReceiveOrderCard('Order #5678', '2 items', '฿120', '2.0 km'),
-              _buildReceiveOrderCard('Order #9101', '4 items', '฿200', '0.8 km'),
+              _buildReceiveOrderCard(
+                  'Order #1234', '3 items', '฿150', '1.5 km'),
+              _buildReceiveOrderCard(
+                  'Order #5678', '2 items', '฿120', '2.0 km'),
+              _buildReceiveOrderCard(
+                  'Order #9101', '4 items', '฿200', '0.8 km'),
             ],
           ),
         ),
@@ -181,7 +208,8 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
                             const SizedBox(width: 10),
                             Text(
                               '1 item',
-                              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                              style: TextStyle(
+                                  color: Colors.grey[600], fontSize: 14),
                             ),
                           ],
                         ),
@@ -226,7 +254,8 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
                             ),
                             child: const Text(
                               'Track on Map',
@@ -246,7 +275,8 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
     );
   }
 
-  Widget _buildReceiveOrderCard(String orderNumber, String items, String price, String distance) {
+  Widget _buildReceiveOrderCard(
+      String orderNumber, String items, String price, String distance) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Padding(
