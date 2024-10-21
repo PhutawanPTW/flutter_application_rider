@@ -16,7 +16,9 @@ class AuthProvider extends ChangeNotifier {
   String? address;
   String? registrationNumber;
   LatLng? selectedPosition;
+  String? profileImageUrl; // เพิ่มตัวแปรสำหรับเก็บ URL ของรูปโปรไฟล์
 
+  // ฟังก์ชันเพื่อเก็บรายละเอียดผู้ใช้
   void setUserDetails({
     required String email,
     required String phoneNumber,
@@ -25,6 +27,7 @@ class AuthProvider extends ChangeNotifier {
     String? address,
     String? registrationNumber,
     LatLng? selectedPosition,
+    String? profileImageUrl, // เพิ่ม profileImageUrl ในการรับ URL รูปโปรไฟล์
   }) {
     this.email = email;
     this.phoneNumber = phoneNumber;
@@ -33,19 +36,21 @@ class AuthProvider extends ChangeNotifier {
     this.address = address;
     this.registrationNumber = registrationNumber;
     this.selectedPosition = selectedPosition;
+    this.profileImageUrl = profileImageUrl; // เก็บ URL ของรูปโปรไฟล์
     notifyListeners();
   }
 
-  // Check if phone number is unique between users and riders
+  // ตรวจสอบว่าหมายเลขโทรศัพท์นี้เป็นเอกลักษณ์หรือไม่
   Future<bool> isPhoneNumberUnique(String phoneNumber) async {
     final userQuery = await _firestore
         .collection('Users')
         .doc(phoneNumber)
-        .get(); // Check if user exists with this phone number
+        .get(); // ตรวจสอบว่ามีผู้ใช้ที่มีหมายเลขโทรศัพท์นี้หรือไม่
 
     return !userQuery.exists;
   }
 
+  // ฟังก์ชันการล็อกอิน
   Future<void> loginUser(String phoneNumber, String password) async {
     try {
       DocumentSnapshot userDoc =
@@ -57,7 +62,7 @@ class AuthProvider extends ChangeNotifier {
         if (userData['password'] == password) {
           isLoggedIn = true;
           currentUserPhoneNumber = phoneNumber;
-          currentUserType = userData['userType']; // Store the user type
+          currentUserType = userData['userType']; // เก็บข้อมูลประเภทผู้ใช้
           notifyListeners();
         } else {
           throw Exception('Incorrect password');
@@ -70,6 +75,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // ฟังก์ชันการสมัครสมาชิกผู้ใช้
   Future<void> signUpUser(String userType) async {
     try {
       bool isUnique = await isPhoneNumberUnique(phoneNumber!);
@@ -80,19 +86,24 @@ class AuthProvider extends ChangeNotifier {
       Map<String, dynamic> userData = {
         'email': email,
         'phoneNumber': phoneNumber,
-        'password': password, // Please encrypt this in production
+        'password': password, // ควรเข้ารหัสก่อนบันทึกในโปรดักชัน
         'fullName': fullName,
         'userType': userType,
         'createdAt': Timestamp.now(),
+        'profileImageUrl': profileImageUrl, // บันทึก URL ของรูปโปรไฟล์
       };
 
+      // ตรวจสอบถ้าเป็น User และมีที่อยู่
       if (userType == "User") {
+        userData['address'] = address; // บันทึกที่อยู่
         userData['location'] = selectedPosition != null
             ? {
                 'latitude': selectedPosition!.latitude,
                 'longitude': selectedPosition!.longitude,
               }
             : null;
+      } else if (userType == "Rider" && registrationNumber != null) {
+        userData['registrationNumber'] = registrationNumber;
       } else if (userType == "Rider" && registrationNumber != null) {
         userData['registrationNumber'] = registrationNumber;
       }
@@ -103,7 +114,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // Method to log out user
+  // ฟังก์ชันล็อกเอาท์
   void logoutUser() {
     isLoggedIn = false;
     currentUserPhoneNumber = null;

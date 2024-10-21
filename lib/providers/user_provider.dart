@@ -8,19 +8,44 @@ class UserProvider with ChangeNotifier {
   Map<String, dynamic> get userData => _userData;
 
   // Fetch user data after login
-  void setUserData(Map<String, dynamic> data) {
-    _userData = data;
-    notifyListeners();
-  }
-
   Future<void> fetchUserData(String phone) async {
     try {
       final userDoc = await _firestore.collection('Users').doc(phone).get();
       if (userDoc.exists) {
-        setUserData(userDoc.data() ?? {});
+        Map<String, dynamic> userData = userDoc.data() ?? {};
+        _userData = userData;
+        notifyListeners();
+
+        debugPrint('User full name: ${userData['fullName']}');
+        debugPrint('User email: ${userData['email']}');
+        debugPrint('User phone: ${userData['phoneNumber']}');
+        debugPrint(
+            'User location: Lat ${userData['location']['latitude']}, Long ${userData['location']['longitude']}');
+      } else {
+        debugPrint('No user found for phone: $phone');
       }
     } catch (e) {
-      print('Error fetching user data: $e');
+      debugPrint('Error fetching user data: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchAllUsersExcludingCurrent(
+      String currentPhone) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('Users')
+          .where('userType', isEqualTo: 'User')
+          .where('phoneNumber', isNotEqualTo: currentPhone)
+          .get();
+
+      List<Map<String, dynamic>> users = [];
+      for (var doc in querySnapshot.docs) {
+        users.add(doc.data());
+      }
+      return users;
+    } catch (e) {
+      debugPrint('Error fetching users: $e');
+      return [];
     }
   }
 

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_rider/pages/page_main/dialog/add_order_dialog.dart';
+import 'package:flutter_application_rider/providers/auth_provider.dart';
+import 'package:flutter_application_rider/providers/order_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class ActiveOrderPage extends StatefulWidget {
   const ActiveOrderPage({super.key});
@@ -9,10 +13,27 @@ class ActiveOrderPage extends StatefulWidget {
 }
 
 class _ActiveOrderPageState extends State<ActiveOrderPage> {
+  @override
+  void initState() {
+    super.initState();
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    // ดึงหมายเลขโทรศัพท์ของผู้ใช้งานที่ล็อกอินอยู่
+    String? currentUserPhone = authProvider.currentUserPhoneNumber;
+
+    if (currentUserPhone != null) {
+      // ใช้ senderPhone แทน
+      orderProvider.fetchOrdersByCreator(currentUserPhone);
+    }
+  }
+
   bool isReceiveMode = false;
 
   @override
   Widget build(BuildContext context) {
+    final orderProvider = Provider.of<OrderProvider>(context);
+    final orders = orderProvider.orders;
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -87,12 +108,19 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
             Expanded(
               child: isReceiveMode
                   ? _buildReceiveOrderList()
-                  : _buildSendOrderList(),
+                  : _buildSendOrderList(orders),
             ),
             if (!isReceiveMode) ...[
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return const AddOrderDialog();
+                    },
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFFDECF),
                   textStyle: GoogleFonts.leagueSpartan(
@@ -115,51 +143,53 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
     );
   }
 
-  Widget _buildSendOrderList() {
-    return ListView(
-        children: [
-          _buildOrderCard('assets/images/strawberry_shake.jpg',
-              'Strawberry Shake', 'Wait for Rider'),
-          _buildOrderCard(
-              'assets/images/hong_thong.jpg', 'Hong Thong', 'Wait for Take'),
-          _buildOrderCard(
-              'assets/images/white_whisky.jpg', 'White Whisky', 'Driving'),
-        ],
+  Widget _buildSendOrderList(List<Order> orders) {
+    return ListView.builder(
+      itemCount: orders.length,
+      itemBuilder: (context, index) {
+        final order = orders[index];
+        return _buildOrderCard(
+          order.imageUrl,
+          order.name,
+          order.status,
+          order.amount.toString(),
+          order.recivePhone, // เพิ่มเบอร์ผู้รับ
         );
-  }
-
-  Widget _buildReceiveOrderList() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-            ),
-          ),
-        ),
-        Expanded(
-          child: ListView(
-            children: [
-              _buildReceiveOrderCard(
-                  'Order #1234', '3 items', '฿150', '1.5 km'),
-              _buildReceiveOrderCard(
-                  'Order #5678', '2 items', '฿120', '2.0 km'),
-              _buildReceiveOrderCard(
-                  'Order #9101', '4 items', '฿200', '0.8 km'),
-            ],
-          ),
-        ),
-      ],
+      },
     );
   }
 
-  Widget _buildOrderCard(String imagePath, String title, String status) {
+  Widget _buildReceiveOrderList() {
+    final orderProvider = Provider.of<OrderProvider>(context);
+    final orders = orderProvider.orders;
+
+    return ListView.builder(
+      itemCount: orders.length,
+      itemBuilder: (context, index) {
+        final order = orders[index];
+
+        // ตรวจสอบว่า recivePhone ตรงกับหมายเลขโทรศัพท์ผู้ใช้งานปัจจุบัน
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final currentUserPhone = authProvider.currentUserPhoneNumber;
+
+        // เฉพาะคำสั่งซื้อที่ส่งมาถึงเบอร์โทรของผู้ใช้งาน (currentUserPhone)
+        if (order.recivePhone == currentUserPhone) {
+          return _buildOrderCard(
+            order.imageUrl,
+            order.name,
+            order.status,
+            order.amount.toString(),
+            order.senderPhone, // แสดงเบอร์ผู้ส่งแทนใน mode Receive
+          );
+        } else {
+          return const SizedBox.shrink(); // ไม่แสดงคำสั่งซื้อที่ไม่เกี่ยวข้อง
+        }
+      },
+    );
+  }
+
+  Widget _buildOrderCard(String? imageUrl, String title, String status,
+      String itemCount, String senderPhone) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
@@ -174,15 +204,19 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  imagePath,
-                  width: 80,
-                  height: 120,
-                  fit: BoxFit.cover,
+              if (imageUrl != null && imageUrl.isNotEmpty)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    imageUrl,
+                    width: 80,
+                    height: 120,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ),
-              ),
               const SizedBox(width: 15),
               Expanded(
                 child: Column(
@@ -207,7 +241,7 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              '1 item',
+                              '$itemCount item${itemCount != '1' ? 's' : ''}',
                               style: TextStyle(
                                   color: Colors.grey[600], fontSize: 14),
                             ),
@@ -223,18 +257,18 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // Action for the 'Detail' button
+                          },
                           style: TextButton.styleFrom(
-                            padding: const EdgeInsets.only(right: 20),
-                            textStyle: GoogleFonts.leagueSpartan(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            padding: EdgeInsets.zero,
+                            minimumSize: const Size(20, 30),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           child: const Text(
                             'Detail',
@@ -244,7 +278,9 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
                         SizedBox(
                           height: 30,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              // Action for the 'Check on Map' button
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFE95322),
                               textStyle: GoogleFonts.leagueSpartan(
@@ -258,7 +294,7 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
                                   const EdgeInsets.symmetric(horizontal: 10),
                             ),
                             child: const Text(
-                              'Track on Map',
+                              'Check on Maps',
                               style: TextStyle(color: Colors.white),
                             ),
                           ),
@@ -270,81 +306,6 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildReceiveOrderCard(
-      String orderNumber, String items, String price, String distance) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    orderNumber,
-                    style: GoogleFonts.leagueSpartan(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    items,
-                    style: GoogleFonts.leagueSpartan(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    price,
-                    style: GoogleFonts.leagueSpartan(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFFE95322),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  distance,
-                  style: GoogleFonts.leagueSpartan(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE95322),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: Text(
-                    'Receive',
-                    style: GoogleFonts.leagueSpartan(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
         ),
       ),
     );

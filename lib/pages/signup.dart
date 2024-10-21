@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_rider/pages/login.dart';
 import 'package:flutter_application_rider/pages/map/map_dialog.dart';
@@ -5,6 +8,7 @@ import 'package:flutter_application_rider/providers/auth_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -21,6 +25,8 @@ class _SignUpPageState extends State<SignUpPage> {
   String selectedRole = 'User';
   String? locationMessage = '';
   LatLng? selectedPosition;
+  File? _selectedImage; // For storing the selected image
+  String? _downloadUrl; // To store the download URL of the uploaded image
 
   final _formKey = GlobalKey<FormState>();
 
@@ -44,6 +50,45 @@ class _SignUpPageState extends State<SignUpPage> {
     addressController.dispose();
     registrationController.dispose();
     super.dispose();
+  }
+
+  // Function to select an image from the gallery
+  Future<void> _selectImage() async {
+    final picker = ImagePicker();
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.gallery); // Open gallery
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path); // Store the selected image
+      });
+    }
+  }
+
+  Future<void> _uploadImageToFirebase() async {
+    if (_selectedImage == null) return;
+
+    try {
+      String timeStamp = DateTime.now()
+          .millisecondsSinceEpoch
+          .toString(); // Use current timestamp
+      String fileName =
+          'users profile/${timeStamp}.jpg'; // Save in 'users profile' folder with timestamp
+      Reference firebaseStorageRef =
+          FirebaseStorage.instance.ref().child(fileName);
+      UploadTask uploadTask = firebaseStorageRef.putFile(_selectedImage!);
+      TaskSnapshot taskSnapshot = await uploadTask;
+
+      String downloadUrl =
+          await taskSnapshot.ref.getDownloadURL(); // Get the image URL
+      setState(() {
+        _downloadUrl = downloadUrl; // Save the download URL for later use
+      });
+
+      print('Image uploaded successfully. URL: $downloadUrl');
+    } catch (e) {
+      print('Error uploading image: $e');
+    }
   }
 
   Future<Position> _determinePosition() async {
@@ -92,6 +137,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   // Reset the fields when switching between User and Rider
+// Reset the form fields when switching roles
   void _resetFields() {
     emailController.clear();
     phoneNumberController.clear();
@@ -102,9 +148,11 @@ class _SignUpPageState extends State<SignUpPage> {
     registrationController.clear();
     setState(() {
       selectedPosition = null;
+      _selectedImage = null; // Reset the selected image when switching roles
     });
   }
 
+  // Show error dialog
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
@@ -128,55 +176,7 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  void _signUp(BuildContext context) async {
-    if (_formKey.currentState?.validate() ?? false) {
-      if (passwordController.text != confirmPasswordController.text) {
-        _showErrorDialog('Passwords do not match');
-        return;
-      }
-
-      if (selectedRole == 'User' && selectedPosition == null) {
-        _showErrorDialog('Please select a GPS location');
-        return;
-      }
-
-      final provider = Provider.of<AuthProvider>(context, listen: false);
-      provider.setUserDetails(
-        email: emailController.text,
-        phoneNumber: phoneNumberController.text,
-        password: passwordController.text,
-        fullName: fullNameController.text,
-        address: selectedRole == 'User' ? addressController.text : null,
-        registrationNumber:
-            selectedRole == 'Rider' ? registrationController.text : null,
-        selectedPosition: selectedRole == 'User' ? selectedPosition : null,
-      );
-
-      // แสดง Loading animation ที่สวยงาม
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return Center(
-            child: LoadingAnimationWidget.fourRotatingDots(
-              color: Colors.deepOrangeAccent, // กำหนดสีของโหลดดิ้ง
-              size: 50, // กำหนดขนาดของโหลดดิ้ง
-            ),
-          );
-        },
-      );
-
-      try {
-        await provider.signUpUser(selectedRole);
-        Navigator.of(context).pop(); // ปิด dialog เมื่อการสมัครสำเร็จ
-        _showSuccessDialog();
-      } catch (e) {
-        Navigator.of(context).pop(); // ปิด dialog เมื่อเกิดข้อผิดพลาด
-        _showErrorDialog(e.toString());
-      }
-    }
-  }
-
+  // Show success dialog
   void _showSuccessDialog() {
     showDialog(
       context: context,
@@ -201,6 +201,63 @@ class _SignUpPageState extends State<SignUpPage> {
         );
       },
     );
+  }
+
+  // Function to sign up the user
+  void _signUp(BuildContext context) async {
+    if (_formKey.currentState?.validate() ?? false) {
+      if (passwordController.text != confirmPasswordController.text) {
+        _showErrorDialog('Passwords do not match');
+        return;
+      }
+
+      if (selectedRole == 'User' && selectedPosition == null) {
+        _showErrorDialog('Please select a GPS location');
+        return;
+      }
+
+      // Upload image if selected
+      if (_selectedImage != null) {
+        await _uploadImageToFirebase();
+      }
+
+      final provider = Provider.of<AuthProvider>(context, listen: false);
+      provider.setUserDetails(
+        email: emailController.text,
+        phoneNumber: phoneNumberController.text,
+        password: passwordController.text,
+        fullName: fullNameController.text,
+        address: selectedRole == 'User' ? addressController.text : null,
+        registrationNumber:
+            selectedRole == 'Rider' ? registrationController.text : null,
+        selectedPosition: selectedRole == 'User' ? selectedPosition : null,
+        profileImageUrl: _downloadUrl,
+      );
+
+      // Show loading animation
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: LoadingAnimationWidget.fourRotatingDots(
+              color: Colors.deepOrangeAccent,
+              size: 50,
+            ),
+          );
+        },
+      );
+
+      try {
+        await provider.signUpUser(selectedRole);
+        Navigator.of(context)
+            .pop(); // Close the dialog when the signup is successful
+        _showSuccessDialog();
+      } catch (e) {
+        Navigator.of(context).pop(); // Close the dialog when there is an error
+        _showErrorDialog(e.toString());
+      }
+    }
   }
 
   @override
@@ -320,30 +377,38 @@ class _SignUpPageState extends State<SignUpPage> {
                                       width: 10.0,
                                     ),
                                   ),
-                                  child: const CircleAvatar(
+                                  child: CircleAvatar(
                                     radius: 60,
-                                    backgroundImage:
-                                        AssetImage('assets/images/logo.png'),
+                                    backgroundImage: _selectedImage != null
+                                        ? FileImage(
+                                            _selectedImage!) // Display the selected image
+                                        : const AssetImage(
+                                                'assets/images/logo.png')
+                                            as ImageProvider,
                                   ),
                                 ),
                                 Positioned(
                                   bottom: 0,
                                   right: 0,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(3),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
-                                    ),
+                                  child: GestureDetector(
+                                    onTap:
+                                        _selectImage, // Call the select image function
                                     child: Container(
-                                      padding: const EdgeInsets.all(5),
+                                      padding: const EdgeInsets.all(3),
                                       decoration: const BoxDecoration(
-                                        color: Color(0xFFD61355),
+                                        color: Colors.white,
                                         shape: BoxShape.circle,
                                       ),
-                                      child: const Icon(
-                                        Icons.edit,
-                                        color: Colors.white,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(5),
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFFD61355),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.edit,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                   ),
