@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_rider/pages/page_main/order.dart';
+import 'package:flutter_application_rider/pages/order/order.dart';
+import 'package:flutter_application_rider/pages/rider/order_rider.dart';
 import 'package:flutter_application_rider/pages/signup.dart';
 import 'package:flutter_application_rider/providers/user_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -40,7 +41,12 @@ class _LoginPageState extends State<LoginPage> {
         );
       } else if (authProvider.currentUserType == 'Rider') {
         _showSuccessDialog(context);
-        // Navigate to Rider's home page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MyOrderRiderPage(),
+          ),
+        );
       }
     } catch (e) {
       _showErrorDialog(context, e.toString());
@@ -62,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.check_circle_outline,
                   color: Colors.greenAccent,
                   size: 80,

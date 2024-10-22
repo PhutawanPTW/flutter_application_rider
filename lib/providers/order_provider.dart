@@ -86,6 +86,29 @@ class OrderProvider with ChangeNotifier {
     }
   }
 
+  // Stream สำหรับ Orders ที่เราส่ง
+  Stream<List<Order>> getSentOrdersStream(String senderPhone) {
+    return _firestore
+        .collection('Orders')
+        .where('senderPhone', isEqualTo: senderPhone)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => Order.fromMap(doc.data())).toList();
+    });
+  }
+
+  // Stream สำหรับ Orders ที่ส่งมาหาเรา
+  Stream<List<Order>> getReceivedOrdersStream(String receiverPhone) {
+    return _firestore
+        .collection('Orders')
+        .where('recivePhone', isEqualTo: receiverPhone)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => Order.fromMap(doc.data())).toList();
+    });
+  }
+
+
   Future<void> addOrder(Order order) async {
     if (order.senderPhone == order.recivePhone) {
       throw Exception('Invalid order: You cannot send an order to yourself.');
