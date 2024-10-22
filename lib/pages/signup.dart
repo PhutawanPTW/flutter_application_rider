@@ -595,7 +595,7 @@ class _SignUpPageState extends State<SignUpPage> {
           controller: controller,
           obscureText: isPassword,
           validator: (value) {
-            if (value == null || value.isEmpty) {
+            if (value == null || value.trim().isEmpty) {
               return 'This field is required';
             }
             return null;
@@ -615,11 +615,11 @@ class _SignUpPageState extends State<SignUpPage> {
               color: Colors.red,
             ),
           ),
-          // ยังคงใช้ keyboardType ที่เหมาะสมสำหรับฟิลด์ป้ายทะเบียนรถ
           keyboardType:
               isLicensePlate ? TextInputType.text : TextInputType.emailAddress,
         ),
       ],
     );
   }
+
 }
