@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 class UserProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  String? _profileImageUrl;
+  String? get profileImageUrl => _profileImageUrl;
+
   Map<String, dynamic> _userData = {};
   Map<String, dynamic> get userData => _userData;
 
@@ -69,6 +72,12 @@ class UserProvider with ChangeNotifier {
       debugPrint('Error searching users: $e');
       return [];
     }
+  }
+
+  Future<void> logout() async {
+    _userData = {};
+    _profileImageUrl = null;
+    notifyListeners();
   }
 
   void clearUserData() {

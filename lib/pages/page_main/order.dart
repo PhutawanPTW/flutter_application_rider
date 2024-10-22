@@ -35,8 +35,21 @@ class _MyOrderPageState extends State<MyOrderPage> {
 
   @override
   Widget build(BuildContext context) {
+    String _getTitle(int index) {
+      switch (index) {
+        case 0:
+          return 'My Order';
+        case 1:
+          return 'Complete Order';
+        case 2:
+          return 'Profile';
+        default:
+          return 'My Order';
+      }
+    }
+
     return Scaffold(
-      extendBodyBehindAppBar: false, // ไม่ให้ body ขยายไปด้านหลัง AppBar
+      extendBodyBehindAppBar: false,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
@@ -44,7 +57,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
           flexibleSpace: SafeArea(
             child: Center(
               child: Text(
-                'My Order',
+                _getTitle(_selectedIndex), // ใช้ฟังก์ชันที่สร้างไว้
                 style: GoogleFonts.leagueSpartan(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,

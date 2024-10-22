@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_rider/pages/login.dart';
 import 'package:flutter_application_rider/providers/user_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -63,9 +64,15 @@ class ProfilePage extends StatelessWidget {
                         width: 10.0,
                       ),
                     ),
-                    child: const CircleAvatar(
+                    child: CircleAvatar(
                       radius: 60,
-                      backgroundImage: AssetImage('assets/images/logo.png'),
+                      backgroundImage: userData['profileImageUrl'] != null
+                          ? NetworkImage(userData['profileImageUrl'])
+                              as ImageProvider
+                          : const AssetImage('assets/images/logo.png'),
+                      onBackgroundImageError: (exception, stackTrace) {
+                        debugPrint('Error loading profile image: $exception');
+                      },
                     ),
                   ),
                 ],
@@ -77,6 +84,78 @@ class ProfilePage extends StatelessWidget {
               _buildInfoField(
                   'Phone Number', userData['phoneNumber'] ?? 'Not provided'),
               _buildInfoField('Address', userData['address'] ?? 'Not provided'),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () async {
+                  // แสดง dialog ยืนยันก่อน logout
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text(
+                          'Logout',
+                          style: GoogleFonts.leagueSpartan(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        content: Text(
+                          'Are you sure you want to logout?',
+                          style: GoogleFonts.leagueSpartan(),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              'Cancel',
+                              style: GoogleFonts.leagueSpartan(
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              await userProvider.logout();
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const LoginPage(),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFE95322),
+                            ),
+                            child: Text(
+                              'Logout',
+                              style: GoogleFonts.leagueSpartan(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFE95322),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                child: Text(
+                  'Logout',
+                  style: GoogleFonts.leagueSpartan(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ],
           ),
         ),

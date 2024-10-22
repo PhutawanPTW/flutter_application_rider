@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // เพิ่ม import นี้
 import 'package:flutter_application_rider/providers/order_provider.dart';
 import 'package:flutter_application_rider/providers/user_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,7 +24,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
   final TextEditingController _phoneReceiveController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   File? _selectedImage;
-  File? _readyImage; // ภาพแสดงว่าสินค้าพร้อมแล้ว
+  File? _readyImage;
   bool _isLoading = false;
   bool _isAmountValid = true;
   bool _isPhoneReceiveValid = true;
@@ -40,7 +41,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
         _searchPhoneNumber();
       } else {
         setState(() {
-          _users = []; // ซ่อน list ถ้าเบอร์ถูกเลือกแล้ว
+          _users = [];
         });
       }
     });
@@ -63,7 +64,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
     if (pickedFile != null) {
       setState(() {
         if (isReadyImage) {
-          _readyImage = File(pickedFile.path); // เก็บภาพแสดงว่าสินค้าพร้อมแล้ว
+          _readyImage = File(pickedFile.path);
         } else {
           _selectedImage = File(pickedFile.path);
         }
@@ -127,9 +128,8 @@ class _AddOrderPageState extends State<AddOrderPage> {
                 ),
                 child: ListTile(
                   leading: const Icon(
-                    HugeIcons
-                        .strokeRoundedSmartPhone04, // เปลี่ยนเป็น HugeIcons
-                    color: Color(0xFFE95322), // ใช้สีเดียวกับที่ใช้ในแอพ
+                    HugeIcons.strokeRoundedSmartPhone04,
+                    color: Color(0xFFE95322),
                     size: 24,
                   ),
                   title: Text(
@@ -144,7 +144,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
                     style: GoogleFonts.leagueSpartan(fontSize: 14),
                   ),
                   trailing: const Icon(
-                    HugeIcons.strokeRoundedArrowDown01, // เปลี่ยนเป็น HugeIcons
+                    HugeIcons.strokeRoundedArrowDown01,
                     color: Colors.grey,
                     size: 24,
                   ),
@@ -229,20 +229,11 @@ class _AddOrderPageState extends State<AddOrderPage> {
                               ),
                             ),
                     ),
-
                     const SizedBox(height: 16),
                     _buildTextField(_nameController, 'Name'),
                     _buildTextField(_amountController, 'Amount',
                         keyboardType: TextInputType.number,
                         isValid: _isAmountValid),
-                    if (!_isAmountValid)
-                      const Padding(
-                        padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-                        child: Text(
-                          'Please enter a valid amount greater than 0',
-                          style: TextStyle(color: Colors.red, fontSize: 12),
-                        ),
-                      ),
                     _buildMultilineTextField(_detailController, 'Detail'),
                     _buildTextField(
                       _phoneReceiveController,
@@ -260,13 +251,11 @@ class _AddOrderPageState extends State<AddOrderPage> {
                       ),
                     _buildPhoneList(),
                     _buildMultilineTextField(_addressController, 'Address'),
-
-                    // ฟิลด์แสดงภาพแสดงว่าสินค้าพร้อมแล้ว
                     const SizedBox(height: 16),
                     GestureDetector(
                       onTap: () => _pickImage(isReadyImage: true),
                       child: Container(
-                        width: double.infinity, // ความกว้างเท่ากับฟิลด์ Address
+                        width: double.infinity,
                         height: 150,
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
@@ -301,7 +290,6 @@ class _AddOrderPageState extends State<AddOrderPage> {
                               ),
                       ),
                     ),
-
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () async {
@@ -313,7 +301,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
                         final currentPhone =
                             userProvider.userData['phoneNumber'];
 
-                        if (amount == null || amount <= 0) {
+                        if (amount == null || amount <= 0 || amount > 99999) {
                           setState(() {
                             _isAmountValid = false;
                           });
@@ -325,15 +313,11 @@ class _AddOrderPageState extends State<AddOrderPage> {
                           _isLoading = true;
                         });
 
-                        // อัปโหลดรูปภาพสินค้า
                         String? imageUrl = await _uploadImageToFirebase(
                             _selectedImage, 'AddOrder');
-
-                        // อัปโหลดรูปภาพสถานะพร้อม
                         String? readyImageUrl = await _uploadImageToFirebase(
                             _readyImage, 'ReadyImages');
 
-                        // ตรวจสอบว่าลิงก์ภาพสินค้าไม่เป็น null ก่อนบันทึก
                         if (imageUrl == null) {
                           setState(() {
                             _isLoading = false;
@@ -352,7 +336,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
                           address: _addressController.text,
                           senderPhone: currentPhone,
                           imageUrl: imageUrl,
-                          readyImageUrl: readyImageUrl, // เพิ่ม readyImageUrl
+                          readyImageUrl: readyImageUrl,
                           status: 'Wait for Rider',
                         );
 
@@ -415,6 +399,56 @@ class _AddOrderPageState extends State<AddOrderPage> {
       fieldIcon = HugeIcons.strokeRoundedEdit01;
     }
 
+    // สำหรับฟิลด์ Amount
+    if (label == 'Amount') {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: TextField(
+          controller: controller,
+          keyboardType: const TextInputType.numberWithOptions(decimal: false),
+          maxLength: 5,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+          ],
+          decoration: InputDecoration(
+            labelText: label,
+            counterText: '',
+            labelStyle: GoogleFonts.leagueSpartan(
+              fontSize: 14,
+              color: const Color(0xFFE95322),
+            ),
+            filled: true,
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide:
+                  const BorderSide(color: Color(0xFFE95322), width: 2.0),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                  color: const Color(0xFFE95322).withOpacity(0.5), width: 1.5),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide:
+                  const BorderSide(color: Color(0xFFE95322), width: 2.0),
+            ),
+            errorText: isValid ? null : 'Please enter a valid amount (1-99999)',
+            errorStyle: GoogleFonts.leagueSpartan(
+              fontSize: 12,
+              color: Colors.red,
+            ),
+            prefixIcon: Icon(
+              fieldIcon,
+              color: const Color(0xFFE95322),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // สำหรับฟิลด์อื่นๆ
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
