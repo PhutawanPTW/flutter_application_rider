@@ -1,10 +1,10 @@
-#Tue Oct 22 19:41:40 ICT 2024
-base.0=D\:\\flutter_application_rider\\build\\app\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
-base.1=D\:\\flutter_application_rider\\build\\app\\intermediates\\dex\\debug\\mergeLibDexDebug\\0\\classes.dex
-base.2=D\:\\flutter_application_rider\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
-base.3=D\:\\flutter_application_rider\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\15\\classes.dex
-base.4=D\:\\flutter_application_rider\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\1\\classes.dex
-base.5=D\:\\flutter_application_rider\\build\\app\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
+#Wed Oct 23 01:15:37 ICT 2024
+base.0=C\:\\MobileAPP\\flutter_application_rider\\build\\app\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
+base.1=C\:\\MobileAPP\\flutter_application_rider\\build\\app\\intermediates\\dex\\debug\\mergeLibDexDebug\\0\\classes.dex
+base.2=C\:\\MobileAPP\\flutter_application_rider\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
+base.3=C\:\\MobileAPP\\flutter_application_rider\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\15\\classes.dex
+base.4=C\:\\MobileAPP\\flutter_application_rider\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\1\\classes.dex
+base.5=C\:\\MobileAPP\\flutter_application_rider\\build\\app\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
 path.0=classes.dex
 path.1=0/classes.dex
 path.2=0/classes.dex

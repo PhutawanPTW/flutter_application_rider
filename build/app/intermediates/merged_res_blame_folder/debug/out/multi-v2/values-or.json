@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.flutter_application_rider.app-mergeDebugResources-29:/values-or/values-or.xml",
+            "outputFile": "com.example.flutter_application_rider.app-mergeDebugResources-6:/values-or/values-or.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\MSI GF63\\.gradle\\caches\\transforms-3\\4c4c4c6cd19762f0486bee303ea09eaa\\transformed\\jetified-play-services-basement-18.3.0\\res\\values-or\\values.xml",
+                    "source": "C:\\Users\\Phutawan Chonsakorn\\.gradle\\caches\\transforms-3\\4c4c4c6cd19762f0486bee303ea09eaa\\transformed\\jetified-play-services-basement-18.3.0\\res\\values-or\\values.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "0",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\MSI GF63\\.gradle\\caches\\transforms-3\\61dca973873414c0fec9033efc963138\\transformed\\core-1.13.1\\res\\values-or\\values-or.xml",
+                    "source": "C:\\Users\\Phutawan Chonsakorn\\.gradle\\caches\\transforms-3\\61dca973873414c0fec9033efc963138\\transformed\\core-1.13.1\\res\\values-or\\values-or.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -38,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\MSI GF63\\.gradle\\caches\\transforms-3\\45034bee22d4e180f763e2e65c7a88e9\\transformed\\jetified-play-services-base-18.1.0\\res\\values-or\\values.xml",
+                    "source": "C:\\Users\\Phutawan Chonsakorn\\.gradle\\caches\\transforms-3\\45034bee22d4e180f763e2e65c7a88e9\\transformed\\jetified-play-services-base-18.1.0\\res\\values-or\\values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
                         "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",

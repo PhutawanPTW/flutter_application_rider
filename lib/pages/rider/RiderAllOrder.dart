@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_rider/pages/rider/RiderRun.dart';
+import 'package:flutter_application_rider/pages/map/RiderRun.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
