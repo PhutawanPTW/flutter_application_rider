@@ -92,12 +92,6 @@
       "languageVersion": "3.4"
     },
     {
-      "name": "csslib",
-      "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/csslib-1.0.0",
-      "packageUri": "lib/",
-      "languageVersion": "2.19"
-    },
-    {
       "name": "cupertino_icons",
       "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/cupertino_icons-1.0.8",
       "packageUri": "lib/",
@@ -302,48 +296,6 @@
       "languageVersion": "2.14"
     },
     {
-      "name": "google_maps",
-      "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/google_maps-8.0.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
-    },
-    {
-      "name": "google_maps_flutter",
-      "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/google_maps_flutter-2.9.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
-    },
-    {
-      "name": "google_maps_flutter_android",
-      "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/google_maps_flutter_android-2.14.6",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
-    },
-    {
-      "name": "google_maps_flutter_ios",
-      "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/google_maps_flutter_ios-2.13.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.3"
-    },
-    {
-      "name": "google_maps_flutter_platform_interface",
-      "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/google_maps_flutter_platform_interface-2.9.2",
-      "packageUri": "lib/",
-      "languageVersion": "3.3"
-    },
-    {
-      "name": "google_maps_flutter_web",
-      "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/google_maps_flutter_web-0.5.10",
-      "packageUri": "lib/",
-      "languageVersion": "3.3"
-    },
-    {
-      "name": "html",
-      "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/html-0.15.4",
-      "packageUri": "lib/",
-      "languageVersion": "2.19"
-    },
-    {
       "name": "http",
       "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/http-1.2.2",
       "packageUri": "lib/",
@@ -354,6 +306,12 @@
       "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/http_parser-4.0.2",
       "packageUri": "lib/",
       "languageVersion": "2.12"
+    },
+    {
+      "name": "hugeicons",
+      "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/hugeicons-0.0.7",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "image",
@@ -414,6 +372,12 @@
       "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/intl-0.17.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
+    },
+    {
+      "name": "ionicons",
+      "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/ionicons-0.2.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
     },
     {
       "name": "json_annotation",
@@ -486,6 +450,12 @@
       "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/material_color_utilities-0.11.1",
       "packageUri": "lib/",
       "languageVersion": "2.17"
+    },
+    {
+      "name": "material_symbols_icons",
+      "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/material_symbols_icons-4.2789.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
     },
     {
       "name": "meta",
@@ -596,12 +566,6 @@
       "languageVersion": "2.12"
     },
     {
-      "name": "sanitize_html",
-      "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/sanitize_html-2.1.0",
-      "packageUri": "lib/",
-      "languageVersion": "2.12"
-    },
-    {
       "name": "sky_engine",
       "rootUri": "file:///C:/flutter/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
@@ -630,12 +594,6 @@
       "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/stream_channel-2.1.2",
       "packageUri": "lib/",
       "languageVersion": "2.19"
-    },
-    {
-      "name": "stream_transform",
-      "rootUri": "file:///C:/Users/Phutawan%20Chonsakorn/AppData/Local/Pub/Cache/hosted/pub.dev/stream_transform-2.1.0",
-      "packageUri": "lib/",
-      "languageVersion": "2.14"
     },
     {
       "name": "string_scanner",
@@ -740,7 +698,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2024-10-20T19:53:36.626919Z",
+  "generated": "2024-10-21T19:53:42.679310Z",
   "generator": "pub",
   "generatorVersion": "3.5.3",
   "flutterRoot": "file:///C:/flutter",

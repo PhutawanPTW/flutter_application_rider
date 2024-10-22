@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_rider/providers/order_provider.dart';
@@ -7,27 +8,43 @@ import 'package:flutter_application_rider/providers/user_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:flutter/services.dart'; // ใช้สำหรับการจัดการแป้นพิมพ์
 
-// AddOrderDialog
-class AddOrderDialog extends StatefulWidget {
-  const AddOrderDialog({super.key});
+class AddOrderPage extends StatefulWidget {
+  const AddOrderPage({super.key});
 
   @override
-  _AddOrderDialogState createState() => _AddOrderDialogState();
+  _AddOrderPageState createState() => _AddOrderPageState();
 }
 
-class _AddOrderDialogState extends State<AddOrderDialog> {
+class _AddOrderPageState extends State<AddOrderPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _detailController = TextEditingController();
   final TextEditingController _phoneReceiveController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   File? _selectedImage;
+  File? _readyImage; // ภาพแสดงว่าสินค้าพร้อมแล้ว
   bool _isLoading = false;
   bool _isAmountValid = true;
   bool _isPhoneReceiveValid = true;
-  String? _phoneReceiveErrorMessage; // เก็บข้อความข้อผิดพลาดเกี่ยวกับเบอร์โทร
+  String? _phoneReceiveErrorMessage;
+  List<Map<String, dynamic>> _users = [];
+  String? _selectedUserPhone;
+
+  @override
+  void initState() {
+    super.initState();
+    _phoneReceiveController.addListener(() {
+      if (_selectedUserPhone == null ||
+          _phoneReceiveController.text != _selectedUserPhone) {
+        _searchPhoneNumber();
+      } else {
+        setState(() {
+          _users = []; // ซ่อน list ถ้าเบอร์ถูกเลือกแล้ว
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -39,29 +56,33 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
+  Future<void> _pickImage({bool isReadyImage = false}) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       setState(() {
-        _selectedImage = File(pickedFile.path);
+        if (isReadyImage) {
+          _readyImage = File(pickedFile.path); // เก็บภาพแสดงว่าสินค้าพร้อมแล้ว
+        } else {
+          _selectedImage = File(pickedFile.path);
+        }
       });
     }
   }
 
-  Future<String?> _uploadImageToFirebase() async {
-    if (_selectedImage == null) return null;
+  Future<String?> _uploadImageToFirebase(File? image, String folderName) async {
+    if (image == null) return null;
 
     try {
-      String fileName = 'AddOrder/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      String fileName =
+          '$folderName/${DateTime.now().millisecondsSinceEpoch}.jpg';
       Reference firebaseStorageRef =
           FirebaseStorage.instance.ref().child(fileName);
-      UploadTask uploadTask = firebaseStorageRef.putFile(_selectedImage!);
+      UploadTask uploadTask = firebaseStorageRef.putFile(image);
       TaskSnapshot taskSnapshot = await uploadTask;
 
       String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-      debugPrint('Image uploaded successfully. URL: $downloadUrl');
       return downloadUrl;
     } catch (e) {
       debugPrint('Error uploading image: $e');
@@ -69,9 +90,81 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
     }
   }
 
-  // ปิดแป้นพิมพ์
+  Future<void> _searchPhoneNumber() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final query = _phoneReceiveController.text;
+    if (query.isNotEmpty) {
+      _users = await userProvider.searchUsersByPhone(query);
+      setState(() {});
+    } else {
+      setState(() {
+        _users = [];
+      });
+    }
+  }
+
+  Widget _buildPhoneList() {
+    return _users.isNotEmpty
+        ? ListView.builder(
+            shrinkWrap: true,
+            itemCount: _users.length,
+            itemBuilder: (context, index) {
+              final user = _users[index];
+              return Container(
+                margin:
+                    const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  leading: const Icon(
+                    HugeIcons
+                        .strokeRoundedSmartPhone04, // เปลี่ยนเป็น HugeIcons
+                    color: Color(0xFFE95322), // ใช้สีเดียวกับที่ใช้ในแอพ
+                    size: 24,
+                  ),
+                  title: Text(
+                    user['phoneNumber'],
+                    style: GoogleFonts.leagueSpartan(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  subtitle: Text(
+                    user['fullName'] ?? 'Unknown Name',
+                    style: GoogleFonts.leagueSpartan(fontSize: 14),
+                  ),
+                  trailing: const Icon(
+                    HugeIcons.strokeRoundedArrowDown01, // เปลี่ยนเป็น HugeIcons
+                    color: Colors.grey,
+                    size: 24,
+                  ),
+                  onTap: () {
+                    setState(() {
+                      _selectedUserPhone = user['phoneNumber'];
+                      _phoneReceiveController.text = _selectedUserPhone!;
+                      _users = [];
+                      _closeKeyboard();
+                    });
+                  },
+                ),
+              );
+            },
+          )
+        : Container();
+  }
+
   void _closeKeyboard() {
-    FocusScope.of(context).unfocus(); // ปิดแป้นพิมพ์โดยการยกเลิก focus
+    FocusScope.of(context).unfocus();
   }
 
   @override
@@ -79,170 +172,249 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
     final orderProvider = Provider.of<OrderProvider>(context, listen: false);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-    return Stack(
-      children: [
-        AbsorbPointer(
-          absorbing: _isLoading, // ล็อกหน้าต่างเมื่อมีการโหลด
-          child: AlertDialog(
-            title: Row(
-              children: [
-                const Icon(Icons.add_box_rounded, color: Color(0xFFE95322)),
-                const SizedBox(width: 8),
-                Text(
-                  'Add New Order',
-                  style: GoogleFonts.leagueSpartan(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(70.0),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          flexibleSpace: SafeArea(
+            child: Center(
+              child: Text(
+                'Add Order',
+                style: GoogleFonts.leagueSpartan(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-              ],
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: _pickImage,
-                    child: _selectedImage == null
-                        ? Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(
-                              Icons.camera_alt,
-                              size: 40,
-                              color: Colors.grey,
-                            ),
-                          )
-                        : Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              image: DecorationImage(
-                                image: FileImage(_selectedImage!),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(_nameController, 'Name'),
-                  _buildTextField(_amountController, 'Amount',
-                      keyboardType: TextInputType.number,
-                      isValid: _isAmountValid),
-                  if (!_isAmountValid)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-                      child: Text(
-                        'Please enter a valid amount greater than 0',
-                        style: TextStyle(color: Colors.red, fontSize: 12),
-                      ),
-                    ),
-                  _buildMultilineTextField(_detailController, 'Detail'),
-                  _buildTextField(
-                    _phoneReceiveController,
-                    'Phone Receive',
-                    keyboardType: TextInputType.phone,
-                  ),
-                  if (!_isPhoneReceiveValid)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
-                      child: Text(
-                        _phoneReceiveErrorMessage ?? 'Invalid phone number.',
-                        style: const TextStyle(color: Colors.red, fontSize: 12),
-                      ),
-                    ),
-                  _buildMultilineTextField(_addressController, 'Address'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      _closeKeyboard(); // ปิดแป้นพิมพ์เมื่อกด Create Order
-
-                      final amountText = _amountController.text;
-                      final amount = int.tryParse(amountText);
-                      final phoneReceive = _phoneReceiveController.text;
-                      final currentPhone = userProvider.userData['phoneNumber'];
-
-                      // Validate the amount field
-                      if (amount == null || amount <= 0) {
-                        setState(() {
-                          _isAmountValid = false;
-                        });
-                        return;
-                      }
-
-                      setState(() {
-                        _isAmountValid = true;
-                        _isLoading = true;
-                      });
-
-                      String? imageUrl = await _uploadImageToFirebase();
-
-                      // สร้างออเดอร์
-                      final order = Order(
-                        name: _nameController.text,
-                        amount: amount,
-                        detail: _detailController.text,
-                        recivePhone: phoneReceive, // เบอร์ผู้รับ
-                        address: _addressController.text,
-                        senderPhone: currentPhone, // เบอร์ผู้ส่ง
-                        imageUrl: imageUrl,
-                        status: 'Wait for Rider',
-                      );
-
-                      try {
-                        // ลองเพิ่มคำสั่งซื้อ หากไม่พบหรือไม่ใช่ User ให้มีข้อผิดพลาด
-                        await orderProvider.addOrder(order);
-                        setState(() {
-                          _isLoading = false;
-                        });
-                        Navigator.of(context)
-                            .pop(); // ปิด Dialog เมื่อเพิ่มสำเร็จ
-                      } catch (e) {
-                        setState(() {
-                          _isLoading = false;
-                          _isPhoneReceiveValid = false;
-                          _phoneReceiveErrorMessage =
-                              e.toString(); // แสดงข้อความข้อผิดพลาด
-                        });
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFE95322),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    child: Text(
-                      'Create Order',
-                      style: GoogleFonts.leagueSpartan(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
           ),
+          backgroundColor: const Color(0xFFF5CB58),
+          elevation: 0,
         ),
-        if (_isLoading)
-          Center(
-            child: LoadingAnimationWidget.fourRotatingDots(
-              color: Colors.deepOrangeAccent,
-              size: 50,
+      ),
+      body: Stack(
+        children: [
+          AbsorbPointer(
+            absorbing: _isLoading,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () => _pickImage(isReadyImage: false),
+                      child: _selectedImage == null
+                          ? Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                HugeIcons.strokeRoundedImageAdd02,
+                                size: 40,
+                              ),
+                            )
+                          : Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                image: DecorationImage(
+                                  image: FileImage(_selectedImage!),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                    ),
+
+                    const SizedBox(height: 16),
+                    _buildTextField(_nameController, 'Name'),
+                    _buildTextField(_amountController, 'Amount',
+                        keyboardType: TextInputType.number,
+                        isValid: _isAmountValid),
+                    if (!_isAmountValid)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
+                        child: Text(
+                          'Please enter a valid amount greater than 0',
+                          style: TextStyle(color: Colors.red, fontSize: 12),
+                        ),
+                      ),
+                    _buildMultilineTextField(_detailController, 'Detail'),
+                    _buildTextField(
+                      _phoneReceiveController,
+                      'Phone Receive',
+                      keyboardType: TextInputType.phone,
+                    ),
+                    if (!_isPhoneReceiveValid)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
+                        child: Text(
+                          _phoneReceiveErrorMessage ?? 'Invalid phone number.',
+                          style:
+                              const TextStyle(color: Colors.red, fontSize: 12),
+                        ),
+                      ),
+                    _buildPhoneList(),
+                    _buildMultilineTextField(_addressController, 'Address'),
+
+                    // ฟิลด์แสดงภาพแสดงว่าสินค้าพร้อมแล้ว
+                    const SizedBox(height: 16),
+                    GestureDetector(
+                      onTap: () => _pickImage(isReadyImage: true),
+                      child: Container(
+                        width: double.infinity, // ความกว้างเท่ากับฟิลด์ Address
+                        height: 150,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: _readyImage == null
+                            ? const Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      HugeIcons.strokeRoundedImageAdd01,
+                                      size: 40,
+                                      color: Color(0xFFE95322),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      'Upload Image (Food Ready)',
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.file(
+                                  _readyImage!,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: 150,
+                                ),
+                              ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        _closeKeyboard();
+
+                        final amountText = _amountController.text;
+                        final amount = int.tryParse(amountText);
+                        final phoneReceive = _phoneReceiveController.text;
+                        final currentPhone =
+                            userProvider.userData['phoneNumber'];
+
+                        if (amount == null || amount <= 0) {
+                          setState(() {
+                            _isAmountValid = false;
+                          });
+                          return;
+                        }
+
+                        setState(() {
+                          _isAmountValid = true;
+                          _isLoading = true;
+                        });
+
+                        // อัปโหลดรูปภาพสินค้า
+                        String? imageUrl = await _uploadImageToFirebase(
+                            _selectedImage, 'AddOrder');
+
+                        // อัปโหลดรูปภาพสถานะพร้อม
+                        String? readyImageUrl = await _uploadImageToFirebase(
+                            _readyImage, 'ReadyImages');
+
+                        // ตรวจสอบว่าลิงก์ภาพสินค้าไม่เป็น null ก่อนบันทึก
+                        if (imageUrl == null) {
+                          setState(() {
+                            _isLoading = false;
+                            _isPhoneReceiveValid = false;
+                            _phoneReceiveErrorMessage =
+                                'Failed to upload product image';
+                          });
+                          return;
+                        }
+
+                        final order = Order(
+                          name: _nameController.text,
+                          amount: amount,
+                          detail: _detailController.text,
+                          recivePhone: phoneReceive,
+                          address: _addressController.text,
+                          senderPhone: currentPhone,
+                          imageUrl: imageUrl,
+                          readyImageUrl: readyImageUrl, // เพิ่ม readyImageUrl
+                          status: 'Wait for Rider',
+                        );
+
+                        try {
+                          await orderProvider.addOrder(order);
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          Navigator.of(context).pop();
+                        } catch (e) {
+                          setState(() {
+                            _isLoading = false;
+                            _isPhoneReceiveValid = false;
+                            _phoneReceiveErrorMessage = e.toString();
+                          });
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE95322),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        'Create Order',
+                        style: GoogleFonts.leagueSpartan(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-      ],
+          if (_isLoading)
+            Center(
+              child: LoadingAnimationWidget.fourRotatingDots(
+                color: Colors.deepOrangeAccent,
+                size: 50,
+              ),
+            ),
+        ],
+      ),
     );
   }
 
   Widget _buildTextField(TextEditingController controller, String label,
       {TextInputType keyboardType = TextInputType.text, bool isValid = true}) {
+    IconData fieldIcon;
+
+    if (label == 'Name') {
+      fieldIcon = HugeIcons.strokeRoundedUserAccount;
+    } else if (label == 'Amount') {
+      fieldIcon = HugeIcons.strokeRoundedAdd01;
+    } else if (label == 'Phone Receive') {
+      fieldIcon = HugeIcons.strokeRoundedSmartPhone01;
+    } else {
+      fieldIcon = HugeIcons.strokeRoundedEdit01;
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
@@ -250,8 +422,33 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
         keyboardType: keyboardType,
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: GoogleFonts.leagueSpartan(
+            fontSize: 14,
+            color: const Color(0xFFE95322),
+          ),
+          filled: true,
+          fillColor: Colors.grey[100],
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Color(0xFFE95322), width: 2.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+                color: const Color(0xFFE95322).withOpacity(0.5), width: 1.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Color(0xFFE95322), width: 2.0),
+          ),
+          errorText: isValid ? null : 'Invalid input',
+          errorStyle: GoogleFonts.leagueSpartan(
+            fontSize: 12,
+            color: Colors.red,
+          ),
+          prefixIcon: Icon(
+            fieldIcon,
+            color: const Color(0xFFE95322),
           ),
         ),
       ),
@@ -260,6 +457,14 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
 
   Widget _buildMultilineTextField(
       TextEditingController controller, String label) {
+    IconData fieldIcon;
+
+    if (label == 'Address') {
+      fieldIcon = HugeIcons.strokeRoundedMapsCircle01;
+    } else {
+      fieldIcon = HugeIcons.strokeRoundedNote;
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
@@ -267,8 +472,28 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
         maxLines: null,
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: GoogleFonts.leagueSpartan(
+            fontSize: 14,
+            color: const Color(0xFFE95322),
+          ),
+          filled: true,
+          fillColor: Colors.grey[100],
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Color(0xFFE95322), width: 2.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+                color: const Color(0xFFE95322).withOpacity(0.5), width: 1.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Color(0xFFE95322), width: 2.0),
+          ),
+          prefixIcon: Icon(
+            fieldIcon,
+            color: const Color(0xFFE95322),
           ),
         ),
       ),

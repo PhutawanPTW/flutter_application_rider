@@ -18,13 +18,12 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
     super.initState();
     final orderProvider = Provider.of<OrderProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    // ดึงหมายเลขโทรศัพท์ของผู้ใช้งานที่ล็อกอินอยู่
     String? currentUserPhone = authProvider.currentUserPhoneNumber;
 
     if (currentUserPhone != null) {
-      // ใช้ senderPhone แทน
+      // ดึงทั้ง Orders ที่เราส่งและ Orders ที่ส่งมาหาเรา
       orderProvider.fetchOrdersByCreator(currentUserPhone);
+      orderProvider.fetchReceivedOrders(currentUserPhone);
     }
   }
 
@@ -34,6 +33,7 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
   Widget build(BuildContext context) {
     final orderProvider = Provider.of<OrderProvider>(context);
     final orders = orderProvider.orders;
+
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -81,6 +81,16 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
                     setState(() {
                       isReceiveMode = true;
                     });
+                    // ดึงข้อมูลใหม่เมื่อเปลี่ยนเป็นโหมด Receive
+                    final authProvider =
+                        Provider.of<AuthProvider>(context, listen: false);
+                    final orderProvider =
+                        Provider.of<OrderProvider>(context, listen: false);
+                    String? currentUserPhone =
+                        authProvider.currentUserPhoneNumber;
+                    if (currentUserPhone != null) {
+                      orderProvider.fetchReceivedOrders(currentUserPhone);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isReceiveMode
@@ -112,33 +122,36 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
             ),
             if (!isReceiveMode) ...[
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return const AddOrderDialog();
-                    },
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFDECF),
-                  textStyle: GoogleFonts.leagueSpartan(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                child: const Text(
-                  'Add New Order',
-                  style: TextStyle(color: Color(0xFFE95322)),
-                ),
-              ),
+              _buildAddNewOrderButton(), // ใช้ฟังก์ชัน widget ที่สร้างใหม่
             ],
           ],
         ),
+      ),
+    );
+  }
+
+// สร้างฟังก์ชัน widget สำหรับปุ่ม Add New Order
+  Widget _buildAddNewOrderButton() {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AddOrderPage()),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFFFFDECF),
+        textStyle: GoogleFonts.leagueSpartan(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
+      child: const Text(
+        'Add New Order',
+        style: TextStyle(color: Color(0xFFE95322)),
       ),
     );
   }
@@ -161,29 +174,32 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
 
   Widget _buildReceiveOrderList() {
     final orderProvider = Provider.of<OrderProvider>(context);
-    final orders = orderProvider.orders;
+    final receivedOrders =
+        orderProvider.receivedOrders; // ใช้ receivedOrders แทน
+
+    if (receivedOrders.isEmpty) {
+      return Center(
+        child: Text(
+          'No orders received',
+          style: GoogleFonts.leagueSpartan(
+            fontSize: 16,
+            color: Colors.grey,
+          ),
+        ),
+      );
+    }
 
     return ListView.builder(
-      itemCount: orders.length,
+      itemCount: receivedOrders.length,
       itemBuilder: (context, index) {
-        final order = orders[index];
-
-        // ตรวจสอบว่า recivePhone ตรงกับหมายเลขโทรศัพท์ผู้ใช้งานปัจจุบัน
-        final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        final currentUserPhone = authProvider.currentUserPhoneNumber;
-
-        // เฉพาะคำสั่งซื้อที่ส่งมาถึงเบอร์โทรของผู้ใช้งาน (currentUserPhone)
-        if (order.recivePhone == currentUserPhone) {
-          return _buildOrderCard(
-            order.imageUrl,
-            order.name,
-            order.status,
-            order.amount.toString(),
-            order.senderPhone, // แสดงเบอร์ผู้ส่งแทนใน mode Receive
-          );
-        } else {
-          return const SizedBox.shrink(); // ไม่แสดงคำสั่งซื้อที่ไม่เกี่ยวข้อง
-        }
+        final order = receivedOrders[index];
+        return _buildOrderCard(
+          order.imageUrl,
+          order.name,
+          order.status,
+          order.amount.toString(),
+          order.senderPhone, // แสดงเบอร์ผู้ส่ง
+        );
       },
     );
   }

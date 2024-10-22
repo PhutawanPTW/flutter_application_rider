@@ -49,6 +49,28 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  // ฟังก์ชันการค้นหาผู้ใช้งานตามหมายเลขโทรศัพท์
+  Future<List<Map<String, dynamic>>> searchUsersByPhone(String query) async {
+    try {
+      // ดึงข้อมูลที่เป็น userType = 'User' และหมายเลขโทรศัพท์ที่ตรงกับ query และไม่ใช่หมายเลขของผู้ใช้งานปัจจุบัน
+      final querySnapshot = await _firestore
+          .collection('Users')
+          .where('userType', isEqualTo: 'User')
+          .where('phoneNumber', isGreaterThanOrEqualTo: query)
+          .where('phoneNumber', isLessThanOrEqualTo: query + '\uf8ff')
+          .get();
+
+      List<Map<String, dynamic>> users = [];
+      for (var doc in querySnapshot.docs) {
+        users.add(doc.data());
+      }
+      return users;
+    } catch (e) {
+      debugPrint('Error searching users: $e');
+      return [];
+    }
+  }
+
   void clearUserData() {
     _userData = {};
     notifyListeners();

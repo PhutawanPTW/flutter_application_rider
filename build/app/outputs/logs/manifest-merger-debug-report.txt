@@ -11,8 +11,6 @@ MERGED from [:image_picker_android] C:\MobileAPP\flutter_application_rider\build
 MERGED from [:image_picker_android] C:\MobileAPP\flutter_application_rider\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:10:5-34:19
 MERGED from [:geolocator_android] C:\MobileAPP\flutter_application_rider\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:5-15:19
 MERGED from [:geolocator_android] C:\MobileAPP\flutter_application_rider\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:5-15:19
-MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:36:5-42:19
-MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:36:5-42:19
 MERGED from [com.google.android.gms:play-services-location:21.0.1] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\bb0ee35183a35f2e58aabc7d8d2edb6f\transformed\jetified-play-services-location-21.0.1\AndroidManifest.xml:7:5-20
 MERGED from [com.google.android.gms:play-services-location:21.0.1] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\bb0ee35183a35f2e58aabc7d8d2edb6f\transformed\jetified-play-services-location-21.0.1\AndroidManifest.xml:7:5-20
 MERGED from [com.google.firebase:firebase-firestore:25.1.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\aa49680a522f19d1e3c87521366ed7cd\transformed\jetified-firebase-firestore-25.1.0\AndroidManifest.xml:13:5-24:19
@@ -47,8 +45,6 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Phutawan Chonsakor
 MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\44cf4116b5180a19bc4c685eb428e431\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\9764f20cec2d8170c931411ffac858bb\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\9764f20cec2d8170c931411ffac858bb\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
-MERGED from [com.google.maps.android:android-maps-utils:3.6.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\935d8c99e732f7b4bbaa64ec4ba7543b\transformed\jetified-android-maps-utils-3.6.0\AndroidManifest.xml:7:5-11:19
-MERGED from [com.google.maps.android:android-maps-utils:3.6.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\935d8c99e732f7b4bbaa64ec4ba7543b\transformed\jetified-android-maps-utils-3.6.0\AndroidManifest.xml:7:5-11:19
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.13.1] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\61dca973873414c0fec9033efc963138\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
 	android:name
@@ -62,12 +58,10 @@ MERGED from C:\MobileAPP\flutter_application_rider\android\app\src\main\AndroidM
 MERGED from [:cloud_firestore] C:\MobileAPP\flutter_application_rider\build\cloud_firestore\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-17:12
 MERGED from [:firebase_storage] C:\MobileAPP\flutter_application_rider\build\firebase_storage\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-17:12
 MERGED from [:firebase_core] C:\MobileAPP\flutter_application_rider\build\firebase_core\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-17:12
-MERGED from [:google_maps_flutter_android] C:\MobileAPP\flutter_application_rider\build\google_maps_flutter_android\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-9:12
 MERGED from [:image_picker_android] C:\MobileAPP\flutter_application_rider\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-36:12
 MERGED from [:flutter_plugin_android_lifecycle] C:\MobileAPP\flutter_application_rider\build\flutter_plugin_android_lifecycle\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-9:12
 MERGED from [:geolocator_android] C:\MobileAPP\flutter_application_rider\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-17:12
 MERGED from [:path_provider_android] C:\MobileAPP\flutter_application_rider\build\path_provider_android\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-9:12
-MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:17:1-44:12
 MERGED from [com.google.android.gms:play-services-location:21.0.1] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\bb0ee35183a35f2e58aabc7d8d2edb6f\transformed\jetified-play-services-location-21.0.1\AndroidManifest.xml:2:1-9:12
 MERGED from [com.google.firebase:firebase-firestore:25.1.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\aa49680a522f19d1e3c87521366ed7cd\transformed\jetified-firebase-firestore-25.1.0\AndroidManifest.xml:2:1-26:12
 MERGED from [com.google.firebase:firebase-storage:21.0.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\dbb735ed717bea46388480d222878957\transformed\jetified-firebase-storage-21.0.0\AndroidManifest.xml:15:1-39:12
@@ -107,7 +101,6 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Ph
 MERGED from [com.google.firebase:firebase-components:18.0.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\dc5447abe6be85a909f8f6fb285ba73d\transformed\jetified-firebase-components-18.0.0\AndroidManifest.xml:15:1-20:12
 MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\00379530893d7f50ccd1aa7406aa3fe2\transformed\core-runtime-2.2.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.window.extensions.core:core:1.0.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\44e09e4b2a180a089a4f49832022fb3d\transformed\jetified-core-1.0.0\AndroidManifest.xml:2:1-7:12
-MERGED from [com.google.maps.android:android-maps-utils:3.6.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\935d8c99e732f7b4bbaa64ec4ba7543b\transformed\jetified-android-maps-utils-3.6.0\AndroidManifest.xml:2:1-13:12
 MERGED from [com.google.firebase:protolite-well-known-types:18.0.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\39b6b5339094047b883c2a9ecb3eb606\transformed\jetified-protolite-well-known-types-18.0.0\AndroidManifest.xml:2:1-11:12
 MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\cd084ac84daaf92af6b73c1d7b63a086\transformed\jetified-grpc-android-1.62.2\AndroidManifest.xml:2:1-9:12
 INJECTED from C:\MobileAPP\flutter_application_rider\android\app\src\debug\AndroidManifest.xml:1:1-7:12
@@ -149,8 +142,6 @@ ADDED from C:\MobileAPP\flutter_application_rider\android\app\src\main\AndroidMa
 		ADDED from C:\MobileAPP\flutter_application_rider\android\app\src\main\AndroidManifest.xml:7:22-62
 queries
 ADDED from C:\MobileAPP\flutter_application_rider\android\app\src\main\AndroidManifest.xml:47:5-52:15
-MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:30:5-34:15
-MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:30:5-34:15
 intent#action:name:android.intent.action.PROCESS_TEXT+data:mimeType:text/plain
 ADDED from C:\MobileAPP\flutter_application_rider\android\app\src\main\AndroidManifest.xml:48:9-51:18
 action#android.intent.action.PROCESS_TEXT
@@ -171,8 +162,6 @@ MERGED from [:firebase_storage] C:\MobileAPP\flutter_application_rider\build\fir
 MERGED from [:firebase_storage] C:\MobileAPP\flutter_application_rider\build\firebase_storage\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-7:41
 MERGED from [:firebase_core] C:\MobileAPP\flutter_application_rider\build\firebase_core\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-7:41
 MERGED from [:firebase_core] C:\MobileAPP\flutter_application_rider\build\firebase_core\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-7:41
-MERGED from [:google_maps_flutter_android] C:\MobileAPP\flutter_application_rider\build\google_maps_flutter_android\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-7:41
-MERGED from [:google_maps_flutter_android] C:\MobileAPP\flutter_application_rider\build\google_maps_flutter_android\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-7:41
 MERGED from [:image_picker_android] C:\MobileAPP\flutter_application_rider\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:6:5-8:41
 MERGED from [:image_picker_android] C:\MobileAPP\flutter_application_rider\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:6:5-8:41
 MERGED from [:flutter_plugin_android_lifecycle] C:\MobileAPP\flutter_application_rider\build\flutter_plugin_android_lifecycle\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-7:41
@@ -181,8 +170,6 @@ MERGED from [:geolocator_android] C:\MobileAPP\flutter_application_rider\build\g
 MERGED from [:geolocator_android] C:\MobileAPP\flutter_application_rider\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-7:41
 MERGED from [:path_provider_android] C:\MobileAPP\flutter_application_rider\build\path_provider_android\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-7:41
 MERGED from [:path_provider_android] C:\MobileAPP\flutter_application_rider\build\path_provider_android\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-7:41
-MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:20:5-44
-MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:20:5-44
 MERGED from [com.google.android.gms:play-services-location:21.0.1] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\bb0ee35183a35f2e58aabc7d8d2edb6f\transformed\jetified-play-services-location-21.0.1\AndroidManifest.xml:5:5-44
 MERGED from [com.google.android.gms:play-services-location:21.0.1] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\bb0ee35183a35f2e58aabc7d8d2edb6f\transformed\jetified-play-services-location-21.0.1\AndroidManifest.xml:5:5-44
 MERGED from [com.google.firebase:firebase-firestore:25.1.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\aa49680a522f19d1e3c87521366ed7cd\transformed\jetified-firebase-firestore-25.1.0\AndroidManifest.xml:6:5-44
@@ -261,8 +248,6 @@ MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\Phutawan Chonsakorn
 MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\00379530893d7f50ccd1aa7406aa3fe2\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.window.extensions.core:core:1.0.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\44e09e4b2a180a089a4f49832022fb3d\transformed\jetified-core-1.0.0\AndroidManifest.xml:5:5-44
 MERGED from [androidx.window.extensions.core:core:1.0.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\44e09e4b2a180a089a4f49832022fb3d\transformed\jetified-core-1.0.0\AndroidManifest.xml:5:5-44
-MERGED from [com.google.maps.android:android-maps-utils:3.6.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\935d8c99e732f7b4bbaa64ec4ba7543b\transformed\jetified-android-maps-utils-3.6.0\AndroidManifest.xml:5:5-44
-MERGED from [com.google.maps.android:android-maps-utils:3.6.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\935d8c99e732f7b4bbaa64ec4ba7543b\transformed\jetified-android-maps-utils-3.6.0\AndroidManifest.xml:5:5-44
 MERGED from [com.google.firebase:protolite-well-known-types:18.0.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\39b6b5339094047b883c2a9ecb3eb606\transformed\jetified-protolite-well-known-types-18.0.0\AndroidManifest.xml:7:5-9:41
 MERGED from [com.google.firebase:protolite-well-known-types:18.0.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\39b6b5339094047b883c2a9ecb3eb606\transformed\jetified-protolite-well-known-types-18.0.0\AndroidManifest.xml:7:5-9:41
 MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\cd084ac84daaf92af6b73c1d7b63a086\transformed\jetified-grpc-android-1.62.2\AndroidManifest.xml:5:5-44
@@ -277,8 +262,6 @@ INJECTED from C:\MobileAPP\flutter_application_rider\android\app\src\debug\Andro
 		INJECTED from C:\MobileAPP\flutter_application_rider\android\app\src\debug\AndroidManifest.xml
 uses-permission#android.permission.INTERNET
 ADDED from C:\MobileAPP\flutter_application_rider\android\app\src\debug\AndroidManifest.xml:6:5-66
-MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:24:5-67
-MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:24:5-67
 MERGED from [com.google.firebase:firebase-firestore:25.1.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\aa49680a522f19d1e3c87521366ed7cd\transformed\jetified-firebase-firestore-25.1.0\AndroidManifest.xml:11:5-67
 MERGED from [com.google.firebase:firebase-firestore:25.1.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\aa49680a522f19d1e3c87521366ed7cd\transformed\jetified-firebase-firestore-25.1.0\AndroidManifest.xml:11:5-67
 MERGED from [com.google.firebase:firebase-storage:21.0.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\dbb735ed717bea46388480d222878957\transformed\jetified-firebase-storage-21.0.0\AndroidManifest.xml:24:5-67
@@ -376,31 +359,13 @@ ADDED from [:geolocator_android] C:\MobileAPP\flutter_application_rider\build\ge
 	android:name
 		ADDED from [:geolocator_android] C:\MobileAPP\flutter_application_rider\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:11:13-77
 uses-permission#android.permission.ACCESS_NETWORK_STATE
-ADDED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:23:5-79
-MERGED from [com.google.firebase:firebase-firestore:25.1.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\aa49680a522f19d1e3c87521366ed7cd\transformed\jetified-firebase-firestore-25.1.0\AndroidManifest.xml:10:5-79
-MERGED from [com.google.firebase:firebase-firestore:25.1.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\aa49680a522f19d1e3c87521366ed7cd\transformed\jetified-firebase-firestore-25.1.0\AndroidManifest.xml:10:5-79
+ADDED from [com.google.firebase:firebase-firestore:25.1.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\aa49680a522f19d1e3c87521366ed7cd\transformed\jetified-firebase-firestore-25.1.0\AndroidManifest.xml:10:5-79
 MERGED from [com.google.firebase:firebase-storage:21.0.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\dbb735ed717bea46388480d222878957\transformed\jetified-firebase-storage-21.0.0\AndroidManifest.xml:23:5-79
 MERGED from [com.google.firebase:firebase-storage:21.0.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\dbb735ed717bea46388480d222878957\transformed\jetified-firebase-storage-21.0.0\AndroidManifest.xml:23:5-79
 MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\cd084ac84daaf92af6b73c1d7b63a086\transformed\jetified-grpc-android-1.62.2\AndroidManifest.xml:7:5-79
 MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\cd084ac84daaf92af6b73c1d7b63a086\transformed\jetified-grpc-android-1.62.2\AndroidManifest.xml:7:5-79
 	android:name
-		ADDED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:23:22-76
-uses-feature#0x00020000
-ADDED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:26:5-28:35
-	android:glEsVersion
-		ADDED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:27:9-41
-	android:required
-		ADDED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:28:9-32
-package#com.google.android.apps.maps
-ADDED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:33:9-64
-	android:name
-		ADDED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:33:18-61
-uses-library#org.apache.http.legacy
-ADDED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:39:9-41:40
-	android:required
-		ADDED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:41:13-37
-	android:name
-		ADDED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\ae5ae6497f7a5a6e1686ae92b911041f\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:40:13-50
+		ADDED from [com.google.firebase:firebase-firestore:25.1.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\aa49680a522f19d1e3c87521366ed7cd\transformed\jetified-firebase-firestore-25.1.0\AndroidManifest.xml:10:22-76
 meta-data#com.google.firebase.components:com.google.firebase.firestore.FirebaseFirestoreKtxRegistrar
 ADDED from [com.google.firebase:firebase-firestore:25.1.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\aa49680a522f19d1e3c87521366ed7cd\transformed\jetified-firebase-firestore-25.1.0\AndroidManifest.xml:17:13-19:85
 	android:value
@@ -503,8 +468,6 @@ ADDED from [androidx.window:window:1.2.0] C:\Users\Phutawan Chonsakorn\.gradle\c
 		ADDED from [androidx.window:window:1.2.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\b09bb3297090c12cc852ac6a1b550e43\transformed\jetified-window-1.2.0\AndroidManifest.xml:27:13-51
 meta-data#com.google.android.gms.version
 ADDED from [com.google.android.gms:play-services-basement:18.3.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\4c4c4c6cd19762f0486bee303ea09eaa\transformed\jetified-play-services-basement-18.3.0\AndroidManifest.xml:21:9-23:69
-MERGED from [com.google.maps.android:android-maps-utils:3.6.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\935d8c99e732f7b4bbaa64ec4ba7543b\transformed\jetified-android-maps-utils-3.6.0\AndroidManifest.xml:8:9-10:69
-MERGED from [com.google.maps.android:android-maps-utils:3.6.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\935d8c99e732f7b4bbaa64ec4ba7543b\transformed\jetified-android-maps-utils-3.6.0\AndroidManifest.xml:8:9-10:69
 	android:value
 		ADDED from [com.google.android.gms:play-services-basement:18.3.0] C:\Users\Phutawan Chonsakorn\.gradle\caches\transforms-3\4c4c4c6cd19762f0486bee303ea09eaa\transformed\jetified-play-services-basement-18.3.0\AndroidManifest.xml:23:13-66
 	android:name
