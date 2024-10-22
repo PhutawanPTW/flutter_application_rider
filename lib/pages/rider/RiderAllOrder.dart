@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_rider/pages/rider/RiderRun.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AllOrdersPage extends StatelessWidget {
+class AllOrdersPage extends StatefulWidget {
   const AllOrdersPage({Key? key}) : super(key: key);
 
+  @override
+  _AllOrdersPageState createState() => _AllOrdersPageState();
+}
+
+class _AllOrdersPageState extends State<AllOrdersPage> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -207,8 +213,7 @@ class AllOrdersPage extends StatelessWidget {
     );
   }
 
-  void _showTakeOrderConfirmation(
-      BuildContext context, Map<String, dynamic> orderData) {
+  void _showTakeOrderConfirmation(BuildContext context, Map<String, dynamic> orderData) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -224,8 +229,14 @@ class AllOrdersPage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              // TODO: Implement take order logic
-              Navigator.pop(context);
+              Navigator.pop(context); // ปิด Dialog
+              // ส่ง order data ไปหน้า RiderRun
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RiderRun(orderData: orderData),
+                ),
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFE95322),

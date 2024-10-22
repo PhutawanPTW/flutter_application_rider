@@ -51,6 +51,20 @@ class UserProvider with ChangeNotifier {
       return [];
     }
   }
+  Future<Map<String, dynamic>?> fetchUserLocation(String phone) async {
+    try {
+      final userDoc = await _firestore.collection('Users').doc(phone).get();
+      if (userDoc.exists) {
+        return userDoc.data()?['location'] as Map<String, dynamic>?;
+      } else {
+        debugPrint('No user found for phone: $phone');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Error fetching user location: $e');
+      return null;
+    }
+  }
 
   // ฟังก์ชันการค้นหาผู้ใช้งานตามหมายเลขโทรศัพท์
   Future<List<Map<String, dynamic>>> searchUsersByPhone(String query) async {
