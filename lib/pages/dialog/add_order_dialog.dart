@@ -338,6 +338,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
                           imageUrl: imageUrl,
                           readyImageUrl: readyImageUrl,
                           status: 'Wait for Rider',
+                          id: '',
                         );
 
                         try {

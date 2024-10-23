@@ -305,12 +305,17 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
                       children: [
                         TextButton(
                           onPressed: () {
+                            // ส่ง Stream<Order> ไปยังหน้า DetailUser
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => DetailUser(
-                                  order: order,
-                                  isReceiveMode: isReceiveMode,
+                                  orderStream: Provider.of<OrderProvider>(
+                                          context,
+                                          listen: false)
+                                      .getOrderStream(order
+                                          .id), // Use getOrderStream and pass order.id
+                                  isReceiveMode: !isReceiveMode,
                                 ),
                               ),
                             );

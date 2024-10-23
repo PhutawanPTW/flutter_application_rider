@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_rider/providers/order_provider.dart';
 import 'package:flutter_application_rider/providers/user_provider.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:developer';
-import 'package:flutter_application_rider/providers/order_provider.dart';
 import 'package:provider/provider.dart';
 
 class DetailUser extends StatefulWidget {
-  final Order order;
+  final Stream<Order?> orderStream; // Change to nullable Order
   final bool isReceiveMode;
 
   const DetailUser({
     Key? key,
-    required this.order,
+    required this.orderStream,
     required this.isReceiveMode,
   }) : super(key: key);
 
   @override
   State<DetailUser> createState() => _DetailUserState();
 }
-
-
 
 class _DetailUserState extends State<DetailUser>
     with SingleTickerProviderStateMixin {
@@ -31,8 +28,21 @@ class _DetailUserState extends State<DetailUser>
   @override
   void initState() {
     super.initState();
-    // กำหนด currentStep ตาม status ของ order
-    switch (widget.order.status) {
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void updateStep(String status) {
+    switch (status) {
       case 'Wait for Rider':
         currentStep = 0;
         break;
@@ -49,22 +59,11 @@ class _DetailUserState extends State<DetailUser>
         currentStep = 0;
     }
 
-    _controller = AnimationController(
-      duration: const Duration(seconds: 1),
-      vsync: this,
-    );
-
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
-
     if (currentStep < 3) {
       _controller.repeat();
+    } else {
+      _controller.stop();
     }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
@@ -73,10 +72,7 @@ class _DetailUserState extends State<DetailUser>
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
+          automaticallyImplyLeading: false,
           flexibleSpace: SafeArea(
             child: Center(
               child: Text(
@@ -93,75 +89,89 @@ class _DetailUserState extends State<DetailUser>
           elevation: 0,
         ),
       ),
-      body: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 20,
-            child: Container(
-              color: const Color(0xFFF5CB58),
-            ),
-          ),
-          Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(15),
-                topRight: Radius.circular(15),
-              ),
-            ),
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildOrderStatus(),
-                    const SizedBox(height: 24),
-                    _buildDescription(),
-                    const SizedBox(height: 24),
-                    widget.isReceiveMode
-                        ? Column(
-                            children: [
-                              _buildContactInfo(
-                                'Sender',
-                                widget.order.senderPhone,
-                              ),
-                              const SizedBox(height: 16),
-                              _buildContactInfo(
-                                'Receiver',
-                                widget.order.recivePhone,
-                              ),
-                            ],
-                          )
-                        : Column(
-                            children: [
-                              _buildContactInfo(
-                                'Sender',
-                                widget.order.senderPhone,
-                              ),
-                              const SizedBox(height: 16),
-                              _buildContactInfo(
-                                'Receiver',
-                                widget.order.recivePhone,
-                              ),
-                            ],
-                          ),
-                    const SizedBox(height: 24),
-                    _buildOrderItem(),
-                  ],
+      body: StreamBuilder<Order?>(
+        stream: widget.orderStream,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return const Center(child: Text('Error loading order details'));
+          }
+
+          if (!snapshot.hasData || snapshot.data == null) {
+            return const Center(child: Text('Order not found'));
+          }
+
+          final order = snapshot.data!;
+
+          // อัปเดต currentStep ตาม status ของ order
+          updateStep(order.status);
+
+          return Stack(
+            children: [
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 20,
+                child: Container(
+                  color: const Color(0xFFF5CB58),
                 ),
               ),
-            ),
-          ),
-        ],
+              Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF5F5F5),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildOrderStatus(order),
+                        const SizedBox(height: 24),
+                        _buildDescription(order),
+                        const SizedBox(height: 24),
+                        widget.isReceiveMode
+                            ? Column(
+                                children: [
+                                  _buildContactInfo(
+                                      'Sender', order.senderPhone),
+                                  const SizedBox(height: 16),
+                                  _buildContactInfo(
+                                      'Receiver', order.recivePhone),
+                                ],
+                              )
+                            : Column(
+                                children: [
+                                  _buildContactInfo(
+                                      'Sender', order.senderPhone),
+                                  const SizedBox(height: 16),
+                                  _buildContactInfo(
+                                      'Receiver', order.recivePhone),
+                                ],
+                              ),
+                        const SizedBox(height: 24),
+                        _buildOrderItem(order),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildOrderStatus() {
+  Widget _buildOrderStatus(Order order) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -180,7 +190,7 @@ class _DetailUserState extends State<DetailUser>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  widget.order.status,
+                  order.status,
                   style: GoogleFonts.leagueSpartan(
                     fontSize: 17,
                     fontWeight: FontWeight.w500,
@@ -245,21 +255,6 @@ class _DetailUserState extends State<DetailUser>
     );
   }
 
-  void updateStep(int newStep) {
-    if (newStep <= 3) {
-      setState(() {
-        currentStep = newStep;
-        if (currentStep < 3) {
-          _controller
-            ..reset()
-            ..repeat();
-        } else {
-          _controller.stop();
-        }
-      });
-    }
-  }
-
   Widget _buildOrderStep({
     required String activeSvg,
     required String inactiveSvg,
@@ -281,7 +276,6 @@ class _DetailUserState extends State<DetailUser>
   }
 
   Widget _buildDottedLine({required bool isActive, required bool isPassed}) {
-    // ถ้าผ่านสถานะนี้แล้ว ให้เส้นเป็นสีส้มทั้งหมด
     if (isPassed) {
       return SizedBox(
         width: 50,
@@ -300,7 +294,6 @@ class _DetailUserState extends State<DetailUser>
       );
     }
 
-    // ถ้ายังไม่ถึงสถานะนี้ ให้เป็นสีเทา
     if (!isActive) {
       return SizedBox(
         width: 50,
@@ -319,7 +312,6 @@ class _DetailUserState extends State<DetailUser>
       );
     }
 
-    // ถ้าเป็นสถานะปัจจุบัน ให้มี animation
     return SizedBox(
       width: 50,
       child: AnimatedBuilder(
@@ -349,7 +341,7 @@ class _DetailUserState extends State<DetailUser>
     );
   }
 
-  Widget _buildDescription() {
+  Widget _buildDescription(Order order) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -363,7 +355,7 @@ class _DetailUserState extends State<DetailUser>
         ),
         const SizedBox(height: 8),
         Text(
-          widget.order.detail,
+          order.detail,
           style: GoogleFonts.leagueSpartan(
             fontSize: 15,
             fontWeight: FontWeight.w400,
@@ -380,7 +372,7 @@ class _DetailUserState extends State<DetailUser>
           .fetchUserData(phone),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator(); // แสดง loader ขณะกำลังโหลดข้อมูล
+          return const CircularProgressIndicator();
         }
 
         final userData = snapshot.data;
@@ -451,7 +443,7 @@ class _DetailUserState extends State<DetailUser>
     );
   }
 
-  Widget _buildOrderItem() {
+  Widget _buildOrderItem(Order order) {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -464,8 +456,7 @@ class _DetailUserState extends State<DetailUser>
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.network(
-              widget.order.imageUrl ??
-                  '', // ตรวจสอบค่า imageUrl ว่าเป็น null หรือไม่
+              order.imageUrl ?? '',
               height: 110,
               width: 90,
               fit: BoxFit.cover,
@@ -484,7 +475,7 @@ class _DetailUserState extends State<DetailUser>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.order.name,
+                order.name,
                 style: GoogleFonts.leagueSpartan(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
@@ -493,7 +484,7 @@ class _DetailUserState extends State<DetailUser>
               ),
               const SizedBox(height: 4),
               Text(
-                '${widget.order.amount} items',
+                '${order.amount} items',
                 style: GoogleFonts.leagueSpartan(
                   fontSize: 14,
                   fontWeight: FontWeight.w300,

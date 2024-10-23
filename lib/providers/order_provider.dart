@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 class Order {
+  final String id; // Add this field to store the document ID
   final String name;
   final int amount;
   final String detail;
@@ -9,10 +10,11 @@ class Order {
   final String address;
   final String senderPhone;
   final String? imageUrl;
-  final String? readyImageUrl; // เพิ่ม field นี้
+  final String? readyImageUrl;
   final String status;
 
   Order({
+    required this.id, // Add this required field
     required this.name,
     required this.amount,
     required this.detail,
@@ -38,8 +40,9 @@ class Order {
     };
   }
 
-  factory Order.fromMap(Map<String, dynamic> map) {
+  factory Order.fromMap(Map<String, dynamic> map, String documentId) {
     return Order(
+      id: documentId, // Set the document ID
       name: map['name'],
       amount: map['amount'],
       detail: map['detail'],
@@ -67,7 +70,9 @@ class OrderProvider with ChangeNotifier {
         .where('senderPhone', isEqualTo: senderPhone)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => Order.fromMap(doc.data())).toList();
+      return snapshot.docs.map((doc) {
+        return Order.fromMap(doc.data(), doc.id); // Pass the document ID
+      }).toList();
     });
   }
 
@@ -86,14 +91,15 @@ class OrderProvider with ChangeNotifier {
     }
   }
 
-  // Stream สำหรับ Orders ที่เราส่ง
   Stream<List<Order>> getSentOrdersStream(String senderPhone) {
     return _firestore
         .collection('Orders')
         .where('senderPhone', isEqualTo: senderPhone)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => Order.fromMap(doc.data())).toList();
+      return snapshot.docs
+          .map((doc) => Order.fromMap(doc.data(), doc.id))
+          .toList(); // Pass doc.id
     });
   }
 
@@ -104,7 +110,9 @@ class OrderProvider with ChangeNotifier {
         .where('recivePhone', isEqualTo: receiverPhone)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => Order.fromMap(doc.data())).toList();
+      return snapshot.docs
+          .map((doc) => Order.fromMap(doc.data(), doc.id))
+          .toList(); // Pass doc.id
     });
   }
 
@@ -156,7 +164,7 @@ class OrderProvider with ChangeNotifier {
 
       _receivedOrders.clear();
       for (final doc in snapshot.docs) {
-        final order = Order.fromMap(doc.data());
+        final order = Order.fromMap(doc.data(), doc.id); // Pass doc.id
         _receivedOrders.add(order);
       }
       notifyListeners();
@@ -169,12 +177,12 @@ class OrderProvider with ChangeNotifier {
     try {
       final snapshot = await _firestore
           .collection('Orders')
-          .where('senderPhone', isEqualTo: senderPhone) // ใช้ senderPhone แทน
+          .where('senderPhone', isEqualTo: senderPhone)
           .get();
 
       _orders.clear();
       for (final doc in snapshot.docs) {
-        final order = Order.fromMap(doc.data());
+        final order = Order.fromMap(doc.data(), doc.id); // Pass doc.id
         _orders.add(order);
       }
       notifyListeners();
@@ -188,7 +196,7 @@ class OrderProvider with ChangeNotifier {
     try {
       final doc = await _firestore.collection('Orders').doc(orderId).get();
       if (doc.exists) {
-        return Order.fromMap(doc.data()!);
+        return Order.fromMap(doc.data()!, doc.id); // Pass doc.id
       }
       return null;
     } catch (e) {
@@ -201,7 +209,7 @@ class OrderProvider with ChangeNotifier {
   Stream<Order?> getOrderStream(String orderId) {
     return _firestore.collection('Orders').doc(orderId).snapshots().map((doc) {
       if (doc.exists) {
-        return Order.fromMap(doc.data()!);
+        return Order.fromMap(doc.data()!, doc.id); // Pass doc.id
       }
       return null;
     });
