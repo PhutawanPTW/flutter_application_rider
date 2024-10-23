@@ -108,7 +108,6 @@ class OrderProvider with ChangeNotifier {
     });
   }
 
-
   Future<void> addOrder(Order order) async {
     if (order.senderPhone == order.recivePhone) {
       throw Exception('Invalid order: You cannot send an order to yourself.');
@@ -181,6 +180,52 @@ class OrderProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print('Error fetching orders: $e');
+    }
+  }
+
+  // เพิ่มเมธอดใหม่สำหรับดึงข้อมูล Order เดียว
+  Future<Order?> getOrderById(String orderId) async {
+    try {
+      final doc = await _firestore.collection('Orders').doc(orderId).get();
+      if (doc.exists) {
+        return Order.fromMap(doc.data()!);
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Error fetching order: $e');
+      return null;
+    }
+  }
+
+  // เพิ่มเมธอดสำหรับดึง Stream ของ Order เดียว
+  Stream<Order?> getOrderStream(String orderId) {
+    return _firestore.collection('Orders').doc(orderId).snapshots().map((doc) {
+      if (doc.exists) {
+        return Order.fromMap(doc.data()!);
+      }
+      return null;
+    });
+  }
+
+  // เพิ่มเมธอดสำหรับอัพเดทสถานะแบบละเอียด
+  Future<void> updateOrder(
+    String orderId, {
+    String? status,
+    String? readyImageUrl,
+    // เพิ่มพารามิเตอร์อื่นๆ ที่ต้องการอัพเดทได้
+  }) async {
+    try {
+      final Map<String, dynamic> updates = {};
+
+      if (status != null) updates['status'] = status;
+      if (readyImageUrl != null) updates['readyImageUrl'] = readyImageUrl;
+
+      await _firestore.collection('Orders').doc(orderId).update(updates);
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error updating order: $e');
+      throw e;
     }
   }
 }

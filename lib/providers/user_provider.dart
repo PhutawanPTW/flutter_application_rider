@@ -11,24 +11,21 @@ class UserProvider with ChangeNotifier {
   Map<String, dynamic> get userData => _userData;
 
   // Fetch user data after login
-  Future<void> fetchUserData(String phone) async {
+  Future<Map<String, dynamic>?> fetchUserData(String phoneNumber) async {
     try {
-      final userDoc = await _firestore.collection('Users').doc(phone).get();
-      if (userDoc.exists) {
-        Map<String, dynamic> userData = userDoc.data() ?? {};
-        _userData = userData;
-        notifyListeners();
+      final snapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(phoneNumber) // หรือ query by phoneNumber
+          .get();
 
-        debugPrint('User full name: ${userData['fullName']}');
-        debugPrint('User email: ${userData['email']}');
-        debugPrint('User phone: ${userData['phoneNumber']}');
-        debugPrint(
-            'User location: Lat ${userData['location']['latitude']}, Long ${userData['location']['longitude']}');
+      if (snapshot.exists) {
+        return snapshot.data(); // คืนค่าข้อมูลของผู้ใช้
       } else {
-        debugPrint('No user found for phone: $phone');
+        return null; // ถ้าไม่เจอข้อมูล คืนค่า null
       }
     } catch (e) {
-      debugPrint('Error fetching user data: $e');
+      print('Error fetching user data: $e');
+      return null;
     }
   }
 
@@ -51,6 +48,7 @@ class UserProvider with ChangeNotifier {
       return [];
     }
   }
+
   Future<Map<String, dynamic>?> fetchUserLocation(String phone) async {
     try {
       final userDoc = await _firestore.collection('Users').doc(phone).get();

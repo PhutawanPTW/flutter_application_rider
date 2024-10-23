@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_rider/pages/dialog/add_order_dialog.dart';
+import 'package:flutter_application_rider/pages/order/detail.dart';
 import 'package:flutter_application_rider/providers/auth_provider.dart';
 import 'package:flutter_application_rider/providers/order_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -178,6 +179,7 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
               order.status,
               order.amount.toString(),
               order.recivePhone,
+              order, // เพิ่ม parameter order
             );
           },
         );
@@ -220,6 +222,7 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
               order.status,
               order.amount.toString(),
               order.senderPhone,
+              order, // เพิ่ม parameter order
             );
           },
         );
@@ -228,7 +231,7 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
   }
 
   Widget _buildOrderCard(String? imageUrl, String title, String status,
-      String itemCount, String senderPhone) {
+      String itemCount, String senderPhone, Order order) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
@@ -302,7 +305,15 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
                       children: [
                         TextButton(
                           onPressed: () {
-                            // Action for the 'Detail' button
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailUser(
+                                  order: order,
+                                  isReceiveMode: isReceiveMode,
+                                ),
+                              ),
+                            );
                           },
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.zero,
@@ -317,9 +328,7 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
                         SizedBox(
                           height: 30,
                           child: ElevatedButton(
-                            onPressed: () {
-                              // Action for the 'Check on Map' button
-                            },
+                            onPressed: () {},
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFE95322),
                               textStyle: GoogleFonts.leagueSpartan(

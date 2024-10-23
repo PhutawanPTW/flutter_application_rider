@@ -1,26 +1,86 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_application_rider/providers/user_provider.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:developer';
+import 'package:flutter_application_rider/providers/order_provider.dart';
+import 'package:provider/provider.dart';
 
 class DetailUser extends StatefulWidget {
-  const DetailUser({super.key});
+  final Order order;
+  final bool isReceiveMode;
+
+  const DetailUser({
+    Key? key,
+    required this.order,
+    required this.isReceiveMode,
+  }) : super(key: key);
 
   @override
   State<DetailUser> createState() => _DetailUserState();
 }
 
-class _DetailUserState extends State<DetailUser> {
+
+
+class _DetailUserState extends State<DetailUser>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  int currentStep = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // กำหนด currentStep ตาม status ของ order
+    switch (widget.order.status) {
+      case 'Wait for Rider':
+        currentStep = 0;
+        break;
+      case 'Cooking':
+        currentStep = 1;
+        break;
+      case 'Delivery':
+        currentStep = 2;
+        break;
+      case 'Complete':
+        currentStep = 3;
+        break;
+      default:
+        currentStep = 0;
+    }
+
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
+
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+
+    if (currentStep < 3) {
+      _controller.repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70.0),
         child: AppBar(
-          automaticallyImplyLeading: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
           flexibleSpace: SafeArea(
             child: Center(
               child: Text(
-                'User Details',
+                'Detail Order',
                 style: GoogleFonts.leagueSpartan(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
@@ -33,217 +93,417 @@ class _DetailUserState extends State<DetailUser> {
           elevation: 0,
         ),
       ),
-      body: Container(
-        width: double.infinity,
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    'Waiting for the rider pickup',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      IconWithLabel(
-                        icon: Icons.receipt_long,
-                        label: 'Order',
-                        iconColor: Colors.orange,
-                      ),
-                      DottedLine(),
-                      IconWithLabel(
-                        icon: Icons.kitchen,
-                        label: 'Cooking',
-                      ),
-                      DottedLine(),
-                      IconWithLabel(
-                        icon: Icons.delivery_dining,
-                        label: 'Delivery',
-                      ),
-                      DottedLine(),
-                      IconWithLabel(
-                        icon: Icons.check_circle,
-                        label: 'Complete',
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  // Align(
-                  //   alignment: Alignment.centerLeft, // ทำให้ชิดซ้าย
-                  //   child: Text(
-                  //     'Description',
-                  //     style: TextStyle(
-                  //       fontSize: 14,
-                  //       fontWeight: FontWeight.bold,
-                  //     ),
-                  //   ),
-                  // ),
-                  // Text(
-                  //   'Hong Thong is one of Thailand\'s most popular spirits, '
-                  //   'known for its distinctive smooth taste and aromatic profile.',
-                  //   style: TextStyle(fontSize: 14),
-                  //   textAlign: TextAlign.left, // ข้อความคำอธิบายชิดซ้าย
-                  // ),
-                  Description(
-                    context,
-                    'Description', // ส่ง title
-                    'Hong Thong is one of Thailand\'s most popular spirits, '
-                        'known for its distinctive smooth taste and aromatic profile.', // ส่ง description
-                  ),
-                  SizedBox(height: 16),
-                  _buildInfoRow('Sender', 'Kiw printf',
-                      'Mahasarakham University', '0987564213'),
-                  _buildInfoRow('Receiver', 'TJ',
-                      'Sinsup City Home Mahasarakham University', '0912345678'),
-                  SizedBox(height: 16),
-                  PicNameAmount(
-                    context,
-                    'https://www.hokkee.com/hk_shop/images/product/4066a7_e38df6d433a94450b09f95470a026bce_mv2-28-09-2022-16-05-42.jpg', // URL ของรูปภาพ
-                    'Hong Thong', // ชื่อสินค้า
-                    '1', // จำนวนสินค้า
-                  )
-                ],
+      body: Stack(
+        children: [
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 20,
+            child: Container(
+              color: const Color(0xFFF5CB58),
+            ),
+          ),
+          Container(
+            decoration: const BoxDecoration(
+              color: Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(15),
+                topRight: Radius.circular(15),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(
-      String title, String name, String address, String phone) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildOrderStatus(),
+                    const SizedBox(height: 24),
+                    _buildDescription(),
+                    const SizedBox(height: 24),
+                    widget.isReceiveMode
+                        ? Column(
+                            children: [
+                              _buildContactInfo(
+                                'Sender',
+                                widget.order.senderPhone,
+                              ),
+                              const SizedBox(height: 16),
+                              _buildContactInfo(
+                                'Receiver',
+                                widget.order.recivePhone,
+                              ),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              _buildContactInfo(
+                                'Sender',
+                                widget.order.senderPhone,
+                              ),
+                              const SizedBox(height: 16),
+                              _buildContactInfo(
+                                'Receiver',
+                                widget.order.recivePhone,
+                              ),
+                            ],
+                          ),
+                    const SizedBox(height: 24),
+                    _buildOrderItem(),
+                  ],
                 ),
-                Text(name),
-                Text(address),
-                Text(phone),
-              ],
+              ),
             ),
           ),
         ],
       ),
     );
   }
-}
 
-class IconWithLabel extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color iconColor;
-
-  const IconWithLabel({
-    required this.icon,
-    required this.label,
-    this.iconColor = Colors.black,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Icon(icon, size: 30, color: iconColor),
-        SizedBox(height: 4),
-        Text(label, style: TextStyle(fontSize: 12)),
-      ],
-    );
-  }
-}
-
-class DottedLine extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildOrderStatus() {
     return Container(
-      height: 2,
-      width: 40,
-      child: Row(
-        children: List.generate(12, (index) {
-          return Expanded(
-            child: Container(
-              color: index.isEven ? Colors.grey : Colors.transparent,
-              height: 2,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: const Color(0xFFD4D4D4),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.order.status,
+                  style: GoogleFonts.leagueSpartan(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF5C5352),
+                  ),
+                ),
+                Image.asset(
+                  'assets/images/completed_task.png',
+                  height: 32,
+                ),
+              ],
             ),
-          );
-        }),
+          ),
+          const SizedBox(height: 20),
+          _buildOrderProgress(),
+        ],
       ),
     );
   }
-}
 
-Widget PicNameAmount(
-    BuildContext context, String imageUrl, String productName, String amount) {
-  return Container(
-    padding: EdgeInsets.all(8),
-    decoration: BoxDecoration(
-      border: Border.all(color: Colors.grey),
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.start,
+  Widget _buildOrderProgress() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Image.network(
-          imageUrl, // ใช้ตัวแปร imageUrl ที่ส่งมา
-          height: 100, // ลดขนาดความสูง
-          width: 100, // เพิ่มขนาดความกว้างเพื่อให้รูปภาพมีสัดส่วนที่เหมาะสม
+        _buildOrderStep(
+          activeSvg: 'assets/svg/Order.svg',
+          inactiveSvg: 'assets/svg/Order.svg',
+          isActive: currentStep >= 0,
+          isSvg: true,
         ),
-        SizedBox(width: 8),
-        Expanded(
-          child: Column(
+        _buildDottedLine(
+          isActive: currentStep == 0,
+          isPassed: currentStep > 0,
+        ),
+        _buildOrderStep(
+          activeSvg: 'assets/svg/CookingColor.png',
+          inactiveSvg: 'assets/svg/Cooking.png',
+          isActive: currentStep >= 1,
+          isSvg: false,
+        ),
+        _buildDottedLine(
+          isActive: currentStep == 1,
+          isPassed: currentStep > 1,
+        ),
+        _buildOrderStep(
+          activeSvg: 'assets/svg/DeliveryColor.png',
+          inactiveSvg: 'assets/svg/Delivery.png',
+          isActive: currentStep >= 2,
+          isSvg: false,
+        ),
+        _buildDottedLine(
+          isActive: currentStep == 2,
+          isPassed: currentStep > 2,
+        ),
+        _buildOrderStep(
+          activeSvg: 'assets/svg/Complete.svg',
+          inactiveSvg: 'assets/svg/Complete.svg',
+          isActive: currentStep >= 3,
+          isSvg: true,
+        ),
+      ],
+    );
+  }
+
+  void updateStep(int newStep) {
+    if (newStep <= 3) {
+      setState(() {
+        currentStep = newStep;
+        if (currentStep < 3) {
+          _controller
+            ..reset()
+            ..repeat();
+        } else {
+          _controller.stop();
+        }
+      });
+    }
+  }
+
+  Widget _buildOrderStep({
+    required String activeSvg,
+    required String inactiveSvg,
+    bool isActive = false,
+    required bool isSvg,
+  }) {
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: isSvg
+          ? SvgPicture.asset(
+              isActive ? activeSvg : inactiveSvg,
+              color: isActive ? const Color(0xFFFE8C00) : null,
+            )
+          : Image.asset(
+              isActive ? activeSvg : inactiveSvg,
+            ),
+    );
+  }
+
+  Widget _buildDottedLine({required bool isActive, required bool isPassed}) {
+    // ถ้าผ่านสถานะนี้แล้ว ให้เส้นเป็นสีส้มทั้งหมด
+    if (isPassed) {
+      return SizedBox(
+        width: 50,
+        child: Row(
+          children: List.generate(
+            6,
+            (index) => Expanded(
+              child: Container(
+                height: 2,
+                margin: const EdgeInsets.symmetric(horizontal: 2),
+                color: const Color(0xFFFE8C00),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // ถ้ายังไม่ถึงสถานะนี้ ให้เป็นสีเทา
+    if (!isActive) {
+      return SizedBox(
+        width: 50,
+        child: Row(
+          children: List.generate(
+            6,
+            (index) => Expanded(
+              child: Container(
+                height: 2,
+                margin: const EdgeInsets.symmetric(horizontal: 2),
+                color: Colors.grey.shade300,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // ถ้าเป็นสถานะปัจจุบัน ให้มี animation
+    return SizedBox(
+      width: 50,
+      child: AnimatedBuilder(
+        animation: _animation,
+        builder: (context, child) {
+          return Row(
+            children: List.generate(
+              6,
+              (index) {
+                final position = _animation.value;
+                final dotPosition = index / 5;
+                final distance = (position - dotPosition).abs();
+                final opacity = (1.0 - distance).clamp(0.3, 1.0);
+
+                return Expanded(
+                  child: Container(
+                    height: 2,
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    color: const Color(0xFFFE8C00).withOpacity(opacity),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildDescription() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Description',
+          style: GoogleFonts.leagueSpartan(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xFF5C5352),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          widget.order.detail,
+          style: GoogleFonts.leagueSpartan(
+            fontSize: 15,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xFF878787),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContactInfo(String title, String phone) {
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: Provider.of<UserProvider>(context, listen: false)
+          .fetchUserData(phone),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator(); // แสดง loader ขณะกำลังโหลดข้อมูล
+        }
+
+        final userData = snapshot.data;
+        if (userData == null) {
+          return const Text('User not found');
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.leagueSpartan(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF5C5352),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                userData['fullName'] ?? 'Unknown',
+                style: GoogleFonts.leagueSpartan(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF878787),
+                ),
+              ),
+            ),
+            _buildContactDetailWithImage(
+              'assets/images/placeholder.png',
+              userData['address'] ?? 'No address',
+            ),
+            _buildContactDetailWithImage(
+              'assets/images/phone-call.png',
+              phone,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildContactDetailWithImage(String imagePath, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        children: [
+          Image.asset(
+            imagePath,
+            width: 20,
+            height: 20,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.leagueSpartan(
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xFF878787),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOrderItem() {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.network(
+              widget.order.imageUrl ??
+                  '', // ตรวจสอบค่า imageUrl ว่าเป็น null หรือไม่
+              height: 110,
+              width: 90,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  height: 110,
+                  width: 90,
+                  color: Colors.grey[200],
+                  child: const Icon(Icons.image_not_supported),
+                );
+              },
+            ),
+          ),
+          const SizedBox(width: 12),
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                productName, // ใช้ตัวแปร productName ที่ส่งมา
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                widget.order.name,
+                style: GoogleFonts.leagueSpartan(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF5C5352),
+                ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
-                'Item: $amount', // ใช้ตัวแปร amount ที่ส่งมา
-                style: TextStyle(fontSize: 14),
+                '${widget.order.amount} items',
+                style: GoogleFonts.leagueSpartan(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w300,
+                  color: const Color(0xFF5C5352),
+                ),
               ),
             ],
           ),
-        ),
-      ],
-    ),
-  );
-}
-
-Widget Description(BuildContext context, String title, String description) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start, // ชิดซ้าย
-    children: [
-      Align(
-        alignment: Alignment.centerLeft, // ทำให้ชิดซ้าย
-        child: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        ],
       ),
-      const SizedBox(height: 8), // เว้นระยะห่างระหว่างหัวข้อกับเนื้อหา
-      Text(
-        description,
-        style: const TextStyle(fontSize: 14),
-        textAlign: TextAlign.left, // ข้อความคำอธิบายชิดซ้าย
-      ),
-    ],
-  );
+    );
+  }
 }
