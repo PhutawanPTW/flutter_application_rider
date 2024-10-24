@@ -3,6 +3,7 @@ import 'package:flutter_application_rider/pages/login.dart';
 import 'package:flutter_application_rider/providers/user_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'dart:developer';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -42,11 +43,8 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
-    final userData = userProvider.userData;
-
-    // ตรวจสอบว่า user เป็น Rider หรือไม่
-    final bool isRider = userData['userType'] == 'Rider';
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userData = userProvider.currentUserData;
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -67,106 +65,28 @@ class ProfilePage extends StatelessWidget {
                         width: 10.0,
                       ),
                     ),
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundImage: userData['profileImageUrl'] != null
-                          ? NetworkImage(userData['profileImageUrl'])
-                              as ImageProvider
-                          : const AssetImage('assets/images/logo.png'),
-                      onBackgroundImageError: (exception, stackTrace) {
-                        debugPrint('Error loading profile image: $exception');
-                      },
-                    ),
+                    child: userProvider.profileImageUrl != null
+                        ? CircleAvatar(
+                            backgroundImage:
+                                NetworkImage(userProvider.profileImageUrl!),
+                          )
+                        : const CircleAvatar(
+                            radius: 60,
+                            backgroundImage:
+                                AssetImage('assets/images/logo.png'),
+                          ),
                   ),
                 ],
               ),
               const SizedBox(height: 32),
-              _buildInfoField(
-                  'Full Name', userData['fullName'] ?? 'Not provided'),
-              _buildInfoField('Email', userData['email'] ?? 'Not provided'),
-              _buildInfoField(
-                  'Phone Number', userData['phoneNumber'] ?? 'Not provided'),
-
-              // แสดง Registration Number แทน Address ถ้าเป็น Rider
-              if (isRider)
-                _buildInfoField('Registration Number',
-                    userData['registrationNumber'] ?? 'Not provided')
-              else
+              _buildInfoField('Full Name', userData['fullName'] ?? ''),
+              _buildInfoField('Email', userData['email'] ?? ''),
+              _buildInfoField('Phone Number', userData['phoneNumber'] ?? ''),
+              if (userData['userType'] == 'Rider')
                 _buildInfoField(
-                    'Address', userData['address'] ?? 'Not provided'),
-
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () async {
-                  // แสดง dialog ยืนยันก่อน logout
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text(
-                          'Logout',
-                          style: GoogleFonts.leagueSpartan(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        content: Text(
-                          'Are you sure you want to logout?',
-                          style: GoogleFonts.leagueSpartan(),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text(
-                              'Cancel',
-                              style: GoogleFonts.leagueSpartan(
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              await userProvider.logout();
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginPage(),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFE95322),
-                            ),
-                            child: Text(
-                              'Logout',
-                              style: GoogleFonts.leagueSpartan(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFE95322),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                child: Text(
-                  'Logout',
-                  style: GoogleFonts.leagueSpartan(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+                    'Registration Number', userData['registrationNumber'] ?? '')
+              else
+                _buildInfoField('Address', userData['address'] ?? ''),
             ],
           ),
         ),

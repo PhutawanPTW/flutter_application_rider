@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:developer';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_application_rider/providers/auth_provider.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
@@ -170,7 +172,10 @@ class _AddOrderPageState extends State<AddOrderPage> {
   @override
   Widget build(BuildContext context) {
     final orderProvider = Provider.of<OrderProvider>(context, listen: false);
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    final currentUserPhone = authProvider.currentUserPhoneNumber;
+    log("currentPhone: $currentUserPhone");
 
     return Scaffold(
       appBar: PreferredSize(
@@ -298,8 +303,15 @@ class _AddOrderPageState extends State<AddOrderPage> {
                         final amountText = _amountController.text;
                         final amount = int.tryParse(amountText);
                         final phoneReceive = _phoneReceiveController.text;
-                        final currentPhone =
-                            userProvider.userData['phoneNumber'];
+                        if (currentUserPhone == null || currentUserPhone.isEmpty) {
+                          setState(() {
+                            _isLoading = false;
+                            _isPhoneReceiveValid = false;
+                            _phoneReceiveErrorMessage =
+                                'Your phone number is not available. Please check your profile settings.';
+                          });
+                          return;
+                        }
 
                         if (amount == null || amount <= 0 || amount > 99999) {
                           setState(() {
@@ -334,11 +346,11 @@ class _AddOrderPageState extends State<AddOrderPage> {
                           detail: _detailController.text,
                           recivePhone: phoneReceive,
                           address: _addressController.text,
-                          senderPhone: currentPhone,
+                          senderPhone: currentUserPhone,
                           imageUrl: imageUrl,
                           readyImageUrl: readyImageUrl,
                           status: 'Wait for Rider',
-                          id: '',
+                          id: '', // จะถูกตั้งค่าใน provider ตอนบันทึกข้อมูล
                         );
 
                         try {

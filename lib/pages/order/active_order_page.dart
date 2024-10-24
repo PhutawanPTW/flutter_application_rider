@@ -14,21 +14,21 @@ class ActiveOrderPage extends StatefulWidget {
 }
 
 class _ActiveOrderPageState extends State<ActiveOrderPage> {
+  bool isReceiveMode = false;
+
   @override
   void initState() {
     super.initState();
-    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     String? currentUserPhone = authProvider.currentUserPhoneNumber;
 
     if (currentUserPhone != null) {
+      final orderProvider = Provider.of<OrderProvider>(context, listen: false);
       // ดึงทั้ง Orders ที่เราส่งและ Orders ที่ส่งมาหาเรา
       orderProvider.fetchOrdersByCreator(currentUserPhone);
       orderProvider.fetchReceivedOrders(currentUserPhone);
     }
   }
-
-  bool isReceiveMode = false;
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +118,6 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
     );
   }
 
-// สร้างฟังก์ชัน widget สำหรับปุ่ม Add New Order
   Widget _buildAddNewOrderButton() {
     return ElevatedButton(
       onPressed: () {
@@ -179,7 +178,7 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
               order.status,
               order.amount.toString(),
               order.recivePhone,
-              order, // เพิ่ม parameter order
+              order.id, // ส่ง id ให้ด้วย
             );
           },
         );
@@ -222,7 +221,7 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
               order.status,
               order.amount.toString(),
               order.senderPhone,
-              order, // เพิ่ม parameter order
+              order.id, // ส่ง id ให้ด้วย
             );
           },
         );
@@ -231,7 +230,7 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
   }
 
   Widget _buildOrderCard(String? imageUrl, String title, String status,
-      String itemCount, String senderPhone, Order order) {
+      String itemCount, String senderPhone, String orderId) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
@@ -305,7 +304,7 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
                       children: [
                         TextButton(
                           onPressed: () {
-                            // ส่ง Stream<Order> ไปยังหน้า DetailUser
+                            // ส่ง orderId ไปใน getOrderStream
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -313,8 +312,7 @@ class _ActiveOrderPageState extends State<ActiveOrderPage> {
                                   orderStream: Provider.of<OrderProvider>(
                                           context,
                                           listen: false)
-                                      .getOrderStream(order
-                                          .id), // Use getOrderStream and pass order.id
+                                      .getOrderStream(orderId),
                                   isReceiveMode: !isReceiveMode,
                                 ),
                               ),

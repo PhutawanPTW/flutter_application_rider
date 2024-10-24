@@ -74,6 +74,7 @@ class AuthProvider extends ChangeNotifier {
       throw Exception('Failed to login: $e');
     }
   }
+  
 
   // ฟังก์ชันการสมัครสมาชิกผู้ใช้
   Future<void> signUpUser(String userType) async {

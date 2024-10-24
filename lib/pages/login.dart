@@ -27,8 +27,8 @@ class _LoginPageState extends State<LoginPage> {
     try {
       await authProvider.loginUser(phoneNumber, password);
 
-      // Fetch user data after successful login
-      await userProvider.fetchUserData(phoneNumber);
+      // หลังจากล็อกอินสำเร็จ เก็บข้อมูลผู้ใช้ใน UserProvider
+      await userProvider.fetchCurrentUserData(phoneNumber);
 
       // Navigate to the respective page based on userType
       if (authProvider.currentUserType == 'User') {

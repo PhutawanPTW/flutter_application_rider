@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer';
 
 class UserProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -10,21 +11,44 @@ class UserProvider with ChangeNotifier {
   Map<String, dynamic> _userData = {};
   Map<String, dynamic> get userData => _userData;
 
-  // Fetch user data after login
-  Future<Map<String, dynamic>?> fetchUserData(String phoneNumber) async {
-    try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(phoneNumber) // หรือ query by phoneNumber
-          .get();
+  Map<String, dynamic> _currentUserData = {};
+  Map<String, dynamic> get currentUserData => _currentUserData;
 
-      if (snapshot.exists) {
-        return snapshot.data(); // คืนค่าข้อมูลของผู้ใช้
+  // ดึงข้อมูล user อื่นๆ (สำหรับหน้า Detail)
+  Future<Map<String, dynamic>?> fetchUserData(String phone) async {
+    try {
+      final userDoc = await _firestore.collection('Users').doc(phone).get();
+      if (userDoc.exists) {
+        return userDoc.data();
       } else {
-        return null; // ถ้าไม่เจอข้อมูล คืนค่า null
+        log('No user found for phone: $phone');
+        return null;
       }
     } catch (e) {
-      print('Error fetching user data: $e');
+      log('Error fetching user data: $e');
+      return null;
+    }
+  }
+
+  // ดึงข้อมูล user ปัจจุบัน (สำหรับหน้า Profile)
+  Future<Map<String, dynamic>?> fetchCurrentUserData(String phone) async {
+    log('Fetching current user data for phone: $phone');
+    try {
+      final userDoc = await _firestore.collection('Users').doc(phone).get();
+      log('Firestore query completed');
+      if (userDoc.exists) {
+        log('Document exists');
+        _currentUserData = userDoc.data() ?? {};
+        log('Current User Data: $_currentUserData');
+        notifyListeners();
+        return _currentUserData;
+      } else {
+        log('No user document found for phone: $phone');
+        return null;
+      }
+    } catch (e) {
+      log('Error fetching current user data: $e');
+      log('Error stack trace: ${StackTrace.current}');
       return null;
     }
   }
@@ -44,7 +68,7 @@ class UserProvider with ChangeNotifier {
       }
       return users;
     } catch (e) {
-      debugPrint('Error fetching users: $e');
+      log('Error fetching users: $e');
       return [];
     }
   }
@@ -55,11 +79,11 @@ class UserProvider with ChangeNotifier {
       if (userDoc.exists) {
         return userDoc.data()?['location'] as Map<String, dynamic>?;
       } else {
-        debugPrint('No user found for phone: $phone');
+        log('No user found for phone: $phone');
         return null;
       }
     } catch (e) {
-      debugPrint('Error fetching user location: $e');
+      log('Error fetching user location: $e');
       return null;
     }
   }
@@ -81,19 +105,19 @@ class UserProvider with ChangeNotifier {
       }
       return users;
     } catch (e) {
-      debugPrint('Error searching users: $e');
+      log('Error searching users: $e');
       return [];
     }
   }
 
   Future<void> logout() async {
-    _userData = {};
+    _currentUserData = {}; // เคลียร์ข้อมูล current user
     _profileImageUrl = null;
     notifyListeners();
   }
 
   void clearUserData() {
-    _userData = {};
+    _currentUserData = {}; // เคลียร์ข้อมูล current user
     notifyListeners();
   }
 }
