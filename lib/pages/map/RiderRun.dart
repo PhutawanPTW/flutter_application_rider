@@ -281,114 +281,120 @@ void _showDistanceAlert(BuildContext context, double distance) {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          if (_isLoading)
-            const Center(child: CircularProgressIndicator())
-          else
-            Column(
-              children: [
-                // Yellow header
-                Container(
-                  color: const Color(0xFFFFD700),
-                  padding: const EdgeInsets.only(
-                    top: 40,
-                    left: 16,
-                    right: 16,
-                    bottom: 16,
-                  ),
-                  child: Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center, // ทำให้ข้อความอยู่ตรงกลาง
-                    children: [
-                      Text(
-                        'Location Rider',
-                        style: GoogleFonts.leagueSpartan(
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Map
-                Expanded(
-                  child: FlutterMap(
-                    mapController: _mapController,
-                    options: MapOptions(
-                      initialCenter: _currentPosition != null
-                          ? LatLng(_currentPosition!.latitude,
-                              _currentPosition!.longitude)
-                          : const LatLng(
-                              13.7563, 100.5018), // Default to Bangkok
-                      initialZoom: 15,
+    return WillPopScope(
+      onWillPop: () async {
+      // Return false to prevent the back button from closing the page
+      return false;
+    },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            if (_isLoading)
+              const Center(child: CircularProgressIndicator())
+            else
+              Column(
+                children: [
+                  // Yellow header
+                  Container(
+                    color: const Color(0xFFFFD700),
+                    padding: const EdgeInsets.only(
+                      top: 40,
+                      left: 16,
+                      right: 16,
+                      bottom: 16,
                     ),
-                    children: [
-                      TileLayer(
-                        urlTemplate:
-                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        userAgentPackageName: 'com.example.app',
-                      ),
-                      MarkerLayer(
-                        markers: _markers,
-                      ),
-                    ],
-                  ),
-                ),
-                // Upload Photo Button
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 5,
-                        offset: Offset(0, -2),
-                      ),
-                    ],
-                  ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFE95322),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    child: Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.center, // ทำให้ข้อความอยู่ตรงกลาง
+                      children: [
+                        Text(
+                          'Location Rider',
+                          style: GoogleFonts.leagueSpartan(
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      onPressed: () async {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Upload()),
-                        );
-
-                        if (result != null) {
-                          int receivedValue = result as int;
-                          debugPrint('Received value: $receivedValue');
-                          refreshMap(
-                              receivedValue); // รีเฟรชแผนที่เมื่อได้รับค่า 909
-                        }
-                      },
-                      child: Text(
-                        'Upload Photo',
-                        style: GoogleFonts.leagueSpartan(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
-        ],
+      
+                  // Map
+                  Expanded(
+                    child: FlutterMap(
+                      mapController: _mapController,
+                      options: MapOptions(
+                        initialCenter: _currentPosition != null
+                            ? LatLng(_currentPosition!.latitude,
+                                _currentPosition!.longitude)
+                            : const LatLng(
+                                13.7563, 100.5018), // Default to Bangkok
+                        initialZoom: 15,
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate:
+                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName: 'com.example.app',
+                        ),
+                        MarkerLayer(
+                          markers: _markers,
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Upload Photo Button
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 5,
+                          offset: Offset(0, -2),
+                        ),
+                      ],
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFE95322),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Upload()),
+                          );
+      
+                          if (result != null) {
+                            int receivedValue = result as int;
+                            debugPrint('Received value: $receivedValue');
+                            refreshMap(
+                                receivedValue); // รีเฟรชแผนที่เมื่อได้รับค่า 909
+                          }
+                        },
+                        child: Text(
+                          'Upload Photo',
+                          style: GoogleFonts.leagueSpartan(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+          ],
+        ),
       ),
     );
   }

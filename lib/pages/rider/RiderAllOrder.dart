@@ -10,57 +10,33 @@ class AllOrdersPage extends StatefulWidget {
   _AllOrdersPageState createState() => _AllOrdersPageState();
 }
 
-class _AllOrdersPageState extends State<AllOrdersPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('Orders')
-                .where('status', isEqualTo: 'Wait for Rider')
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
+// ฟังก์ชันสำหรับดึงข้อมูลที่อยู่ของผู้ส่ง
+Future<String?> _getSenderAddress(String senderPhone) async {
+  try {
+    final senderDoc = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(senderPhone)
+        .get();
 
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return Center(
-                  child: Text(
-                    'No orders available',
-                    style: GoogleFonts.leagueSpartan(
-                      fontSize: 18,
-                      color: Colors.grey,
-                    ),
-                  ),
-                );
-              }
-
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (context, index) {
-                  final orderData =
-                      snapshot.data!.docs[index].data() as Map<String, dynamic>;
-                  return _buildOrderCard(context, orderData);
-                },
-              );
-            },
-          ),
-        ),
-      ],
-    );
+    if (senderDoc.exists) {
+      return senderDoc.data()?['address'] as String?;
+    }
+    return null;
+  } catch (e) {
+    print('Error fetching sender address: $e');
+    return null;
   }
+}
 
+class _AllOrdersPageState extends State<AllOrdersPage> {
+  // ฟังก์ชันสร้างการ์ดสำหรับแต่ละออร์เดอร์
   Widget _buildOrderCard(BuildContext context, Map<String, dynamic> orderData) {
     // ดึงข้อมูลจาก orderData
-    final String imageUrl = orderData['imageUrl'] ?? '';
-    final String name = orderData['name'] ?? 'Unnamed Product';
-    final String amount = orderData['amount']?.toString() ?? '0';
-    final String address = orderData['address'] ?? 'No address';
-
+    final String imageUrl = orderData['imageUrl'];
+    final String name = orderData['name'];
+    final int amount = orderData['amount'];
+    final String senderPhone = orderData['senderPhone'];
+    final String address = orderData['address'];
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
@@ -68,9 +44,9 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
       ),
       color: Colors.white,
       elevation: 0,
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 5),
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(8),
         child: IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -104,29 +80,73 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
                               child: Text(
                                 name,
                                 style: GoogleFonts.leagueSpartan(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              '$amount item${amount != '1' ? 's' : ''}',
-                              style: TextStyle(
-                                  color: Colors.grey[600], fontSize: 14),
+                              '$amount item${amount != 1 ? 's' : ''}',
+                              style: const TextStyle(
+                                color: Color(0xFF5C5352),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w300,
+                              ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 8),
-                        Text(
-                          address,
-                          style: GoogleFonts.leagueSpartan(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                        FutureBuilder<String?>(
+                          future: _getSenderAddress(senderPhone),
+                          builder: (context, snapshot) {
+                            return Row(
+                              children: [
+                                Image.asset(
+                                  'assets/images/restaurant.png',
+                                  width: 21,
+                                  height: 21,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    snapshot.data ?? 'Loading...',
+                                    style: GoogleFonts.leagueSpartan(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w300,
+                                      color: const Color(0xFF5C5352),
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Image.asset(
+                              'assets/images/home.png',
+                              width: 22,
+                              height: 22,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                address,
+                                style: GoogleFonts.leagueSpartan(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w300,
+                                  color: const Color(0xFF5C5352),
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -136,7 +156,6 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
                       children: [
                         TextButton(
                           onPressed: () {
-                            // แสดงรายละเอียดเพิ่มเติม
                             _showOrderDetails(context, orderData);
                           },
                           style: TextButton.styleFrom(
@@ -153,7 +172,6 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
                           height: 30,
                           child: ElevatedButton(
                             onPressed: () {
-                              // รับ Order
                               _showTakeOrderConfirmation(context, orderData);
                             },
                             style: ElevatedButton.styleFrom(
@@ -165,7 +183,8 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
                             ),
                             child: const Text(
                               'Take this Order',
@@ -185,6 +204,7 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
     );
   }
 
+  // ฟังก์ชันแสดงรายละเอียดออร์เดอร์
   void _showOrderDetails(BuildContext context, Map<String, dynamic> orderData) {
     showDialog(
       context: context,
@@ -199,7 +219,8 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
           children: [
             Text('Name: ${orderData['name']}'),
             Text('Amount: ${orderData['amount']}'),
-            Text('Address: ${orderData['address']}'),
+            Text('Sender Address: ${orderData['senderAddress']}'),
+            Text('Receiver Address: ${orderData['receiverAddress']}'),
             Text('Detail: ${orderData['detail']}'),
           ],
         ),
@@ -213,7 +234,8 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
     );
   }
 
-  void _showTakeOrderConfirmation(BuildContext context, Map<String, dynamic> orderData) {
+  // ฟังก์ชันแสดงการยืนยันการรับออร์เดอร์
+ void _showTakeOrderConfirmation(BuildContext context, Map<String, dynamic> orderData) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -228,15 +250,83 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context); // ปิด Dialog
-              // ส่ง order data ไปหน้า RiderRun
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => RiderRun(orderData: orderData),
-                ),
-              );
+            onPressed: () async {
+              try {
+                // อ่านข้อมูลล่าสุดของออเดอร์ก่อนอัพเดท
+                final orderRef = FirebaseFirestore.instance
+                    .collection('Orders')
+                    .doc(orderData['id']);
+                
+                final orderSnapshot = await orderRef.get();
+                
+                // ตรวจสอบว่าสถานะยังคงเป็น "Wait for Rider" อยู่หรือไม่
+                if (!orderSnapshot.exists || orderSnapshot.data()?['status'] != 'Wait for Rider') {
+                  Navigator.pop(context);
+                  // แสดง dialog แจ้งเตือนว่าออเดอร์ถูกรับไปแล้ว
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Order Unavailable'),
+                      content: Text('This order has already been taken by another rider.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('OK'),
+                        ),
+                      ],
+                    ),
+                  );
+                  return;
+                }
+
+                // ใช้ Transaction เพื่อทำการอัพเดทแบบ atomic
+                await FirebaseFirestore.instance.runTransaction((transaction) async {
+                  // อ่านข้อมูลล่าสุดอีกครั้งใน transaction
+                  final freshOrderSnapshot = await transaction.get(orderRef);
+                  
+                  if (!freshOrderSnapshot.exists || 
+                      freshOrderSnapshot.data()?['status'] != 'Wait for Rider') {
+                    throw Exception('Order already taken');
+                  }
+
+                  // อัพเดทสถานะและข้อมูล Rider
+                  transaction.update(orderRef, {
+                    'status': 'Wait for take it',
+                    'riderId': 'CURRENT_RIDER_ID', // ต้องแทนที่ด้วย ID ของ Rider ปัจจุบัน
+                    'acceptedAt': FieldValue.serverTimestamp(),
+                  });
+                });
+
+                Navigator.pop(context); // ปิด Dialog
+
+                // ไปยังหน้า RiderRun
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RiderRun(orderData: orderData),
+                  ),
+                );
+              } catch (e) {
+                Navigator.pop(context);
+                // แสดง error dialog
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Error'),
+                    content: Text(
+                      e.toString() == 'Exception: Order already taken'
+                          ? 'This order has already been taken by another rider.'
+                          : 'Failed to update order status. Please try again.'
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFE95322),
@@ -244,6 +334,49 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
             child: const Text('Confirm'),
           ),
         ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Orders')
+            .where('status', isEqualTo: 'Wait for Rider') // เพิ่มบรรทัดนี้
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(
+              child: Text(
+                'No orders available',
+                style: GoogleFonts.leagueSpartan(
+                  fontSize: 18,
+                  color: Colors.grey,
+                ),
+              ),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              // รวม document ID เข้าไปใน orderData
+              final orderData = {
+                ...snapshot.data!.docs[index].data() as Map<String, dynamic>,
+                'id': snapshot.data!.docs[index].id,
+              };
+              return _buildOrderCard(context, orderData);
+            },
+          );
+        },
       ),
     );
   }
