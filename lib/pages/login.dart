@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_rider/pages/map/RiderRun.dart';
 import 'package:flutter_application_rider/pages/order/order.dart';
 import 'package:flutter_application_rider/pages/rider/order_rider.dart';
 import 'package:flutter_application_rider/pages/signup.dart';
+import 'package:flutter_application_rider/providers/rider_provider.dart';
 import 'package:flutter_application_rider/providers/user_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart'; // Import provider
@@ -19,27 +21,29 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
 
   // Function to log in and check user type
-  Future<void> _login(
-      BuildContext context, String phoneNumber, String password) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
+  Future<void> _login(BuildContext context, String phoneNumber, String password) async {
+  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+  final userProvider = Provider.of<UserProvider>(context, listen: false);
+  final riderOrderProvider = Provider.of<RiderOrderProvider>(context, listen: false);
 
-    try {
-      await authProvider.loginUser(phoneNumber, password);
+  try {
+    await authProvider.loginUser(phoneNumber, password);
+    await userProvider.fetchCurrentUserData(phoneNumber);
 
-      // หลังจากล็อกอินสำเร็จ เก็บข้อมูลผู้ใช้ใน UserProvider
-      await userProvider.fetchCurrentUserData(phoneNumber);
-
-      // Navigate to the respective page based on userType
-      if (authProvider.currentUserType == 'User') {
+    if (authProvider.currentUserType == 'Rider') {
+      // ตรวจสอบ Order ที่ค้างอยู่
+      final pendingOrder = await riderOrderProvider.checkPendingOrder(phoneNumber);
+      
+      if (pendingOrder != null) {
         _showSuccessDialog(context);
+        // นำทางไปยังหน้า RiderRun ทันทีถ้ามี Order ค้างอยู่
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const MyOrderPage(),
+            builder: (context) => RiderRun(orderData: pendingOrder),
           ),
         );
-      } else if (authProvider.currentUserType == 'Rider') {
+      } else {
         _showSuccessDialog(context);
         Navigator.pushReplacement(
           context,
@@ -48,10 +52,19 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
       }
-    } catch (e) {
-      _showErrorDialog(context, e.toString());
+    } else {
+      _showSuccessDialog(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const MyOrderPage(),
+        ),
+      );
     }
+  } catch (e) {
+    _showErrorDialog(context, e.toString());
   }
+}
 
   // Success Dialog
   void _showSuccessDialog(BuildContext context) {

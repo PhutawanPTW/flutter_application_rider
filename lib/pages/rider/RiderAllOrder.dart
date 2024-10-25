@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_rider/pages/map/RiderRun.dart';
+import 'package:flutter_application_rider/providers/rider_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 class AllOrdersPage extends StatefulWidget {
   const AllOrdersPage({Key? key}) : super(key: key);
@@ -236,6 +238,28 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
 
   // ฟังก์ชันแสดงการยืนยันการรับออร์เดอร์
  void _showTakeOrderConfirmation(BuildContext context, Map<String, dynamic> orderData) {
+  final riderOrderProvider = Provider.of<RiderOrderProvider>(context, listen: false);
+  
+  // ตรวจสอบว่ามี Order ที่กำลังดำเนินการอยู่หรือไม่
+  if (riderOrderProvider.currentOrder != null) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Cannot Take New Order',
+          style: GoogleFonts.leagueSpartan(fontWeight: FontWeight.bold),
+        ),
+        content: Text('Please complete your current order before taking a new one.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+    return;
+  }
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

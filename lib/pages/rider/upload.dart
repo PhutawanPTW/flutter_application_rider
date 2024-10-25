@@ -1,8 +1,11 @@
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_application_rider/providers/order_provider.dart';
+import 'package:flutter_application_rider/providers/rider_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class Upload extends StatefulWidget {
   const Upload({Key? key}) : super(key: key);
@@ -34,38 +37,85 @@ class _UploadState extends State<Upload> {
     }
   }
 
-  void _handleReceivedPhoto(File imageFile) {
+  Future<void> _handleReceivedPhoto(File imageFile) async {
     // ฟังก์ชันสำหรับจัดการรูปภาพในโหมด Received
     print('Handling received photo: ${imageFile.path}');
+    
+      try {
+        // Get the order provider from context
+        final orderProvider =
+            Provider.of<OrderProvider>(context, listen: false);
+        final riderOrderProvider =
+            Provider.of<RiderOrderProvider>(context, listen: false);
+
+        // Get current order ID
+        final currentOrderId = riderOrderProvider.currentOrder?['id'];
+        if (currentOrderId == null) {
+          throw Exception('No current order found');
+        }
+
+        // Upload image to Firebase Storage and get URL
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('order_images')
+            .child('$currentOrderId-received.jpg');
+
+        await storageRef.putFile(imageFile);
+        final imageUrl = await storageRef.getDownloadURL();
+
+        // Update order status and image URL
+        await orderProvider.updateOrder(
+          currentOrderId,
+          status: 'Driving',
+          readyImageUrl: imageUrl,
+        );
+
+        print('Photo uploaded and order status updated: ${imageFile.path}');
+
+        // Show success message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Photo uploaded successfully')),
+          );
+        }
+      } catch (e) {
+        print('Error handling received photo: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error uploading photo: $e')),
+          );
+        }
+      
+    }
     // คุณสามารถทำการประมวลผลหรืออัพโหลดที่นี่
   }
 
   void _handleSenderPhoto(File imageFile) {
     // ฟังก์ชันสำหรับจัดการรูปภาพในโหมด Sender
     print('Handling sender photo: ${imageFile.path}');
+    final riderOrderProvider = context.read<RiderOrderProvider>();
+    riderOrderProvider.clearCurrentOrder();
     // คุณสามารถทำการประมวลผลหรืออัพโหลดที่นี่
   }
 
   void _confirmPhoto() {
-  if (_imageFile != null) {
-    // แสดงข้อความยืนยันการเลือกรูปภาพ
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Photo selected: ${_imageFile!.path}')),
-    );
+    if (_imageFile != null) {
+      // แสดงข้อความยืนยันการเลือกรูปภาพ
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Photo selected: ${_imageFile!.path}')),
+      );
 
-    // ส่งเลข 909 ไปยังหน้า RiderRun
-    Future.delayed(const Duration(seconds: 1), () {
-      Navigator.pop(context, 909); // ส่งเลข 909 กลับ
-    });
-  } else {
-    // แสดงข้อความเตือนถ้าไม่มีภาพ
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Please capture an image first!')),
-    );
+      // ส่งเลข 909 ไปยังหน้า RiderRun
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.pop(context, 909); // ส่งเลข 909 กลับ
+      });
+    } else {
+      // แสดงข้อความเตือนถ้าไม่มีภาพ
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please capture an image first!')),
+      );
+    }
   }
-}
-
-
 
   @override
   Widget build(BuildContext context) {
